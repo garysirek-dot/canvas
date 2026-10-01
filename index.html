@@ -198,6 +198,26 @@ button:focus-visible, [contenteditable]:focus-visible { outline: 2px solid #5aa9
 .card.highlight { border: 3px solid var(--list-color); padding: 12px 14px 10px 18px; }
 .card.lp-pulse, .ideas-icon.lp-pulse { animation: lpPulse .28s ease; }
 @keyframes lpPulse { 50% { transform: scale(1.015); } }
+#priBar { margin: 0 20px 20px; }
+#priBar .card.pri-card { position: relative; left: auto !important; top: auto !important; width: 420px; max-width: 100%; z-index: 3; }
+.pri-card .color-btn, .pri-card .add-task, .pri-card .indent, .pri-card .card-grip { display: none !important; }
+.pri-card .card-head { cursor: default; }
+.pri-card .title::before { content: ""; display: inline-block; width: 14px; height: 14px; margin-right: 8px; vertical-align: -1px; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z'/%3E%3C/svg%3E") center/contain no-repeat; }
+.pri-empty { list-style: none; color: var(--faint); font-size: 14px; padding: 4px 0 2px 20px; }
+.pri-item .text { cursor: default; }
+.pri-item .src { font-weight: 700; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; }
+.pri-item .sep { color: var(--dim); font-weight: 700; }
+.pri-owner { flex: none; max-width: 90px; font-size: 13px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.pri-new { animation: priIn .5s ease; }
+@keyframes priIn { from { background: color-mix(in srgb, var(--list-color) 30%, transparent); border-radius: 6px; } to { background: transparent; } }
+.pri-mark { display: none; flex: none; width: 14px; height: 14px; margin-top: 3px; color: #FFD84D; }
+.pri-mark svg { width: 14px; height: 14px; }
+.item.in-pri .pri-mark { display: block; }
+.item.sub .pri-mark { width: 12px; height: 12px; }
+.text[contenteditable="false"] { cursor: default; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.item .text[contenteditable="true"] { box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--list-color) 70%, transparent); border-radius: 4px; background: rgba(255,255,255,.04); }
 .card.dragging { box-shadow: 0 18px 40px rgba(0,0,0,.75); cursor: grabbing; opacity: .97; }
 .card-head {
   display: flex; align-items: flex-start; gap: 8px; padding-bottom: 8px;
@@ -312,6 +332,8 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   .card { position: relative; left: auto !important; top: auto !important; z-index: auto !important; width: 100%; }
   .card-head { cursor: default; touch-action: auto; }
   .card-grip { display: grid; }
+  #priBar { margin: 4px 16px 24px; }
+  #priBar .card.pri-card { width: 100%; padding-top: 14px !important; }
   .card { padding-top: 22px !important; }
   .empty { position: static; }
   .text, .title { font-size: 16px; }
@@ -338,6 +360,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     </div>
   </div>
 </header>
+<div id="priBar"></div>
 <div id="canvas">
 <main id="board" aria-label="Task cards"></main>
 <main id="schedBoard" class="board" aria-label="Schedule cards"></main>
@@ -351,6 +374,12 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   const COLORS = ["#F2F2F2", "#FF6B6B", "#FFA24C", "#FFD84D", "#5FD68A", "#4FD1C5", "#5AA9FF", "#8C9EFF", "#B18CFF", "#FF7EB6"];
   const CARD_W = 420, GAP = 24;
   const LS_KEY = "task-canvas-v1";
+  const PRI_ID = "priorities", PRI_COLOR = "#FFD84D";
+  const priBar = document.getElementById("priBar");
+  const isPri = id => id === PRI_ID;
+  const userLists = () => [...lists.values()].filter(l => !isPri(l.id));
+  const onTaskRoots = (type, fn, opts) => [board, priBar].forEach(r => r.addEventListener(type, fn, opts));
+  const taskCardEls = () => [...priBar.querySelectorAll(".card"), ...board.querySelectorAll(".card")];
   const board = document.getElementById("board");
   const statusEl = document.getElementById("status");
   const phoneMQ = matchMedia("(max-width: 699px)");
@@ -372,6 +401,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     caret: '<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10l5 5 5-5"/></svg>',
     cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
     grip4: '<svg viewBox="0 0 26 6" fill="currentColor"><circle cx="3" cy="3" r="2.2"/><circle cx="9.67" cy="3" r="2.2"/><circle cx="16.33" cy="3" r="2.2"/><circle cx="23" cy="3" r="2.2"/></svg>',
+    star: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>',
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg>',
     indent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M10 12h10M4 18h16M4 10l3 2-3 2"/></svg>',
     outdent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M10 12h10M4 18h16M7 10l-3 2 3 2"/></svg>'
@@ -386,7 +416,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   }
   function clean(l) {
     return { id: l.id, title: l.title, color: l.color, x: Math.round(l.x), y: Math.round(l.y), z: l.z, m: typeof l.m === "number" ? l.m : null, collapsed: !!l.collapsed, highlight: !!l.highlight, created: l.created,
-      items: l.items.map(i => ({ id: i.id, text: i.text, done: !!i.done, indent: i.indent ? 1 : 0, important: !!i.important, bic: i.bic || "" })) };
+      items: l.items.map(i => { const o = { id: i.id, text: i.text, done: !!i.done, indent: i.indent ? 1 : 0, bic: i.bic || "" }; if (i.ref) { o.ref = { l: i.ref.l, i: i.ref.i }; if (i.srcTitle) o.srcTitle = i.srcTitle; if (i.srcColor) o.srcColor = i.srcColor; } return o; }) };
   }
   function scheduleSave(id, delay = 500) {
     pending.add(id);
@@ -421,14 +451,14 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   /* ---------- rendering ---------- */
   function renderAll() {
     const ids = new Set(lists.keys());
-    board.querySelectorAll(".card").forEach(c => { if (!ids.has(c.dataset.id)) c.remove(); });
+    taskCardEls().forEach(c => { if (!ids.has(c.dataset.id)) c.remove(); });
     lists.forEach((_, id) => renderCard(id));
     renderEmpty();
     layout();
   }
   function renderEmpty() {
     let e = canvasEl.querySelector(".empty");
-    let total = lists.size;
+    let total = userLists().length;
     try { total += ideas.size + scheds.size; } catch (err) {}
     if (total === 0) {
       if (!e) {
@@ -440,14 +470,14 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     } else if (e) e.remove();
   }
 
-  function cardEl(id) { return board.querySelector(`.card[data-id="${id}"]`); }
+  function cardEl(id) { return (isPri(id) ? priBar : board).querySelector(`.card[data-id="${id}"]`); }
 
   /* ---------- one shared canvas for task, schedule and note cards ---------- */
   const canvasEl = document.getElementById("canvas");
   const viewW = () => document.documentElement.clientWidth - 40;
   function allCards() {
     const out = [];
-    lists.forEach(l => out.push({ o: l, el: cardEl(l.id), w: CARD_W, save: () => scheduleSave(l.id, 200) }));
+    userLists().forEach(l => out.push({ o: l, el: cardEl(l.id), w: CARD_W, save: () => scheduleSave(l.id, 200) }));
     try { ideas.forEach(n => out.push({ o: n, el: ideaEl(n.id), w: CARD_W, save: () => iScheduleSave(n.id, 200) })); } catch (e) {}
     try { const sw = schedW() || CARD_W; scheds.forEach(s => out.push({ o: s, el: schedEl(s.id), w: sw, save: () => sScheduleSave(s.id, 200) })); } catch (e) {}
     return out;
@@ -587,10 +617,11 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
           <ul class="items"></ul>
           <button class="add-task">${icon.plus}Add task</button>
         </div>`;
-      board.appendChild(card);
+      (isPri(id) ? priBar : board).appendChild(card);
       wireCard(card);
     }
     card.style.color = "";
+    if (isPri(id)) { l.color = PRI_COLOR; l.title = "PRIORITIES"; card.classList.add("pri-card"); }
     card.querySelector(".card-head").style.color = l.color;
     card.style.setProperty("--list-color", l.color);
     const t = card.querySelector(".title");
@@ -617,7 +648,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       else blocks[blocks.length - 1].subs.push(it);
     });
     // order: important (not done) first, then regular, then done
-    const rank = i => (i.done ? 2 : i.important ? 0 : 1);
+    const rank = i => (i.done ? 2 : 1);
     const byRank = (arr, f) => [0, 1, 2].flatMap(r => arr.filter(x => rank(f(x)) === r));
     blocks.forEach(b => { b.subs = byRank(b.subs, x => x); });
     const ordered = byRank(blocks, b => b.head);
@@ -654,18 +685,55 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     toastT = setTimeout(() => { t.hidden = true; undoState = null; }, 6000);
   }
 
+  // ----- priorities -----
+  const priList = () => lists.get(PRI_ID);
+  const priEntriesFor = (lid, iid) => { const p = priList(); return p ? p.items.filter(e => e.ref && e.ref.l === lid && e.ref.i === iid) : []; };
+  function srcOf(entry) { const sl = lists.get(entry.ref.l); return { list: sl, item: sl && sl.items.find(i => i.id === entry.ref.i) }; }
+  function renderPri() {
+    const p = priList(), c = cardEl(PRI_ID);
+    if (!p || !c || c.contains(document.activeElement)) return;
+    renderItems(c, p);
+  }
+  function renderPriRows(card, l, ul) {
+    if (!l.items.length) {
+      const e = document.createElement("li");
+      e.className = "pri-empty";
+      e.textContent = "Press and hold any task to add it here.";
+      ul.appendChild(e);
+    }
+    l.items.forEach(it => {
+      const { list: sl, item: si } = it.ref ? srcOf(it) : {};
+      const li = document.createElement("li");
+      li.className = "item pri-item" + (it.done ? " done" : "");
+      li.dataset.iid = it.id;
+      li.innerHTML = `
+        <span class="grip" aria-hidden="true" title="Drag to reorder">${icon.grip}</span>
+        <button class="check" role="checkbox" aria-checked="${it.done}" aria-label="Priority done">${icon.check}</button>
+        <div class="text"><span class="src"></span><span class="sep"> · </span><span class="t"></span></div>
+        <span class="pri-owner"></span>`;
+      const src = li.querySelector(".src");
+      src.textContent = sl ? sl.title : (it.srcTitle || "REMOVED CARD");
+      src.style.color = sl ? sl.color : (it.srcColor || "var(--dim)");
+      li.querySelector(".t").textContent = si ? si.text : it.text;
+      li.querySelector(".pri-owner").textContent = si ? (si.bic || "") : (it.bic || "");
+      ul.appendChild(li);
+    });
+  }
+
   function renderItems(card, l) {
     const ul = card.querySelector(".items");
     updateTrash(card, l);
     ul.textContent = "";
+    if (isPri(l.id)) { renderPriRows(card, l, ul); return; }
     l.items.forEach(it => {
       const li = document.createElement("li");
-      li.className = "item" + (it.indent ? " sub" : "") + (it.done ? " done" : "") + (it.important ? " important" : "");
+      li.className = "item" + (it.indent ? " sub" : "") + (it.done ? " done" : "") + (priEntriesFor(l.id, it.id).length ? " in-pri" : "");
       li.dataset.iid = it.id;
       li.innerHTML = `
         <span class="grip" aria-hidden="true" title="Drag to reorder">${icon.grip}</span>
         <button class="check" role="checkbox" aria-checked="${it.done}" aria-label="${it.important ? "Important " : ""}${it.indent ? "subtask" : "task"} done">${icon.check}<span class="bang" aria-hidden="true">!</span></button>
-        <div class="text" contenteditable="true" spellcheck="true" autocapitalize="sentences"></div>
+        <div class="text" contenteditable="false" spellcheck="true" autocapitalize="sentences"></div>
+        <span class="pri-mark" title="In Priorities" aria-label="In Priorities">${icon.star}</span>
         <span class="bic tbic"><span class="bic-text" contenteditable="true" spellcheck="false" autocapitalize="words" data-ph="Owner"></span></span>
         <button class="indent" tabindex="-1" aria-label="${it.indent ? "Make a task" : "Make a subtask"}" title="${it.indent ? "Outdent (Shift+Tab)" : "Indent (Tab)"}">${it.indent ? icon.outdent : icon.indent}</button>`;
       li.querySelector(".text").textContent = it.text;
@@ -712,6 +780,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     return pre.toString().length;
   }
   function setCaret(el, pos) {
+    if (el.classList.contains("text") && !el.closest(".pri-item")) el.contentEditable = "true";
     el.focus();
     const s = getSelection(), r = document.createRange();
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -730,6 +799,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
 
   /* ---------- title editing ---------- */
   function editTitle(card, selectAll) {
+    if (isPri(card.dataset.id)) return;
     const t = card.querySelector(".title");
     t.setAttribute("contenteditable", "true");
     t.focus();
@@ -746,7 +816,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     if (!l) return;
     const v = t.textContent.replace(/\s+/g, " ").trim().toUpperCase() || "UNTITLED";
     t.textContent = v;
-    if (v !== l.title) { l.title = v; scheduleSave(l.id); }
+    if (v !== l.title) { l.title = v; scheduleSave(l.id); renderPri(); }
   }
 
   /* ---------- card wiring ---------- */
@@ -795,7 +865,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     head.addEventListener("pointerdown", e => {
       if (e.button !== 0 || e.target.closest("button")) return;
       if (title.getAttribute("contenteditable") === "true") return;
-      if (isPhone()) return;
+      if (isPhone() || isPri(card.dataset.id)) return;
       e.preventDefault();
       const l = L();
       drag = { pid: e.pointerId, sx: e.clientX, sy: e.clientY, ox: l.x, oy: l.y, moved: false, onTitle: !!e.target.closest(".title") };
@@ -903,6 +973,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       if (chk) {
         const it = itemOf(chk);
         const l = L();
+        const before = new Map(l.items.map(i => [i.id, !!i.done]));
         it.done = !it.done;
         const idx = l.items.indexOf(it);
         if (!it.indent) {
@@ -920,6 +991,18 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
         });
         updateTrash(card, l);
         scheduleSave(id);
+        if (!isPri(id)) {
+          let touched = false;
+          l.items.forEach(i => {
+            if (before.get(i.id) === !!i.done) return;
+            priEntriesFor(l.id, i.id).forEach(en => { en.done = !!i.done; touched = true; });
+          });
+          if (touched) {
+            const p = priList();
+            renderPri(); scheduleSave(PRI_ID);
+            setTimeout(() => { const c = cardEl(PRI_ID); const next = sortDone(p.items); if (c && !next.every((x, k) => x === p.items[k])) { animateReorder(c, p, () => { p.items = next; }); scheduleSave(PRI_ID); } }, 450);
+          }
+        }
         clearTimeout(sinkT);
         sinkT = setTimeout(() => {
           if (card.contains(document.activeElement) && document.activeElement.classList.contains("text")) return;
@@ -945,7 +1028,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
 
     ul.addEventListener("input", e => {
       const b = e.target.closest(".tbic .bic-text");
-      if (b) { const it = itemOf(b); it.bic = b.textContent.replace(/\n/g, " "); scheduleSave(id, 700); return; }
+      if (b) { const it = itemOf(b); it.bic = b.textContent.replace(/\n/g, " "); scheduleSave(id, 700); syncPriText(id, it); return; }
       const t = e.target.closest(".text");
       if (!t) return;
       if (!t.textContent) t.textContent = "";
@@ -953,6 +1036,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       const it = itemOf(t);
       it.text = t.textContent.replace(/\n/g, " ");
       scheduleSave(id, 700);
+      syncPriText(id, it);
       layout();
     });
     ul.addEventListener("paste", plainPaste);
@@ -1012,6 +1096,54 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   // A main task carries its subtasks. Drag by the grip (mouse, pen, finger) or press-and-hold a task on touch screens.
   let rd = null;
   function itemsWithout(l, ids) { return l.items.filter(i => !ids.includes(i.id)); }
+  function syncPriText(lid, it) {
+    const ens = priEntriesFor(lid, it.id);
+    if (!ens.length) return;
+    const pc = cardEl(PRI_ID);
+    ens.forEach(en => {
+      en.text = it.text; en.bic = it.bic || "";
+      const r = pc && pc.querySelector(`.item[data-iid="${en.id}"]`);
+      if (r) { r.querySelector(".t").textContent = it.text; r.querySelector(".pri-owner").textContent = it.bic || ""; }
+    });
+    scheduleSave(PRI_ID, 900);
+  }
+  // Press and hold a task: copy it to Priorities (hold again, here or there, to take it off)
+  function togglePriority(card, iid) {
+    const lid = card.dataset.id, p = priList();
+    if (!p) return;
+    let added = null;
+    if (isPri(lid)) {
+      const en = p.items.find(e => e.id === iid);
+      p.items = p.items.filter(e => e.id !== iid);
+      if (en && en.ref) { const sc = cardEl(en.ref.l), sl = lists.get(en.ref.l); if (sc && sl && !sc.contains(document.activeElement)) renderItems(sc, sl); }
+    } else {
+      const l = lists.get(lid), it = l && l.items.find(i => i.id === iid);
+      if (!it) return;
+      const existing = priEntriesFor(lid, iid);
+      if (existing.length) p.items = p.items.filter(e => !existing.includes(e));
+      else {
+        added = { id: uid(), ref: { l: lid, i: iid }, text: it.text, bic: it.bic || "", done: false, indent: 0 };
+        const firstDone = p.items.findIndex(e => e.done);
+        p.items.splice(firstDone < 0 ? p.items.length : firstDone, 0, added);
+      }
+      const row = card.querySelector(`.item[data-iid="${iid}"]`);
+      if (row) { row.classList.toggle("in-pri", !existing.length); row.classList.remove("imp-pulse"); void row.offsetWidth; row.classList.add("imp-pulse"); }
+    }
+    if (navigator.vibrate) try { navigator.vibrate(15); } catch (err) {}
+    renderPri();
+    const pc = cardEl(PRI_ID);
+    if (added && pc) {
+      const r = pc.querySelector(`.item[data-iid="${added.id}"]`);
+      if (r) r.classList.add("pri-new");
+      pc.classList.remove("lp-pulse"); void pc.offsetWidth; pc.classList.add("lp-pulse");
+    }
+    layout();
+    scheduleSave(PRI_ID, 200);
+    const again = () => { const c = cardEl(lid); if (c) togglePriority(c, iid); };
+    if (added) showUndo("Added to Priorities", again);
+    else if (!isPri(lid)) showUndo("Removed from Priorities", again);
+    else showUndo("Removed from Priorities", () => {});
+  }
   function toggleImportant(card, iid) {
     const l = lists.get(card.dataset.id);
     const it = l && l.items.find(i => i.id === iid);
@@ -1094,13 +1226,14 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     const dx = x - rd.sx + (scrollX - rd.scx), dy = y - rd.sy + (scrollY - rd.scy);
     rd.rows.forEach(r => (r.style.transform = `translate(${dx}px, ${dy}px)`));
     // which card is under the pointer? (topmost first)
-    const cards = [...board.querySelectorAll(".card")].sort((a, b) => (+b.style.zIndex || 0) - (+a.style.zIndex || 0));
+    const cards = taskCardEls().sort((a, b) => (isPri(b.dataset.id) - isPri(a.dataset.id)) || ((+b.style.zIndex || 0) - (+a.style.zIndex || 0)));
     let over = null;
     for (const c of cards) {
+      if (isPri(rd.srcId) !== isPri(c.dataset.id)) continue;
       const r = c.getBoundingClientRect();
       if (x >= r.left - 10 && x <= r.right + 10 && y >= r.top - 10 && y <= r.bottom + 10) { over = c; break; }
     }
-    board.querySelectorAll(".card.drop-target").forEach(c => c.classList.remove("drop-target"));
+    taskCardEls().forEach(c => c.classList.remove("drop-target"));
     if (!over) { rd.target = null; rd.line.hidden = true; return; }
     const tl = lists.get(over.dataset.id);
     const rest = itemsWithout(tl, rd.blockIds);
@@ -1137,10 +1270,10 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     document.body.classList.remove("item-drag");
     d.line.remove();
     d.card.style.zIndex = d.prevZ;
-    board.querySelectorAll(".card.drop-target").forEach(c => c.classList.remove("drop-target"));
+    taskCardEls().forEach(c => c.classList.remove("drop-target"));
     d.rows.forEach(r => { r.classList.remove("lifting"); r.style.transform = ""; });
     // Held still long enough without moving: toggle important instead of moving
-    if (commit && d.maxMove < 8 && Date.now() - d.t0 >= PRESS_MS) { toggleImportant(d.card, d.pressId); return true; }
+    if (commit && d.maxMove < 8 && Date.now() - d.t0 >= PRESS_MS) { togglePriority(d.card, d.pressId); return true; }
     if (!commit || !d.target) return true;
     const src = lists.get(d.srcId), tgt = lists.get(d.target.id);
     if (!src || !tgt) return true;
@@ -1167,24 +1300,64 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
 
   // Mouse / pen: press and hold still on a task to toggle important
   let mhold = null;
-  board.addEventListener("pointerdown", e => {
+  onTaskRoots("pointerdown", e => {
     if (e.pointerType === "touch" || e.button !== 0) return;
     const li = e.target.closest(".item");
     if (!li || e.target.closest(".check, .indent, .grip, .bic")) return;
+    if (e.target.closest('.text[contenteditable="true"]')) return; // editing: normal text selection
+    e.preventDefault();
     const card = li.closest(".card");
-    mhold = { x: e.clientX, y: e.clientY, timer: setTimeout(() => {
-      mhold = null;
-      try { getSelection().removeAllRanges(); } catch (err) {}
-      toggleImportant(card, li.dataset.iid);
-    }, 550) };
+    mhold = { x: e.clientX, y: e.clientY, t0: Date.now(), card, li, timer: setTimeout(() => { mhold = null; togglePriority(card, li.dataset.iid); }, 550) };
   });
   const mholdCancel = () => { if (mhold) { clearTimeout(mhold.timer); mhold = null; } };
-  window.addEventListener("pointermove", e => { if (mhold && Math.hypot(e.clientX - mhold.x, e.clientY - mhold.y) > 6) mholdCancel(); });
+  window.addEventListener("pointermove", e => {
+    if (!mhold || Math.hypot(e.clientX - mhold.x, e.clientY - mhold.y) <= 6) return;
+    const h = mhold; mholdCancel();
+    beginTaskDrag(h.card, h.li, h.x, h.y, h.t0);
+    moveTaskDrag(e.clientX, e.clientY);
+    const mv = ev => moveTaskDrag(ev.clientX, ev.clientY);
+    const up = ev => {
+      window.removeEventListener("pointermove", mv);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+      endTaskDrag(ev.type === "pointerup");
+    };
+    window.addEventListener("pointermove", mv);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+  });
   window.addEventListener("pointerup", mholdCancel);
   window.addEventListener("pointercancel", mholdCancel);
 
+  // Double-click (mouse) or double-tap (touch) a task to edit it
+  function editTaskAt(t, x, y) {
+    if (!t || t.closest(".pri-item") || t.contentEditable === "true") return;
+    t.contentEditable = "true";
+    t.focus();
+    let r = null;
+    try {
+      if (document.caretRangeFromPoint) r = document.caretRangeFromPoint(x, y);
+      else if (document.caretPositionFromPoint) { const p = document.caretPositionFromPoint(x, y); if (p) { r = document.createRange(); r.setStart(p.offsetNode, p.offset); } }
+    } catch (err) {}
+    const sel = getSelection();
+    if (r && t.contains(r.startContainer)) { r.collapse(true); sel.removeAllRanges(); sel.addRange(r); }
+    else setCaret(t, t.textContent.length);
+  }
+  board.addEventListener("dblclick", e => { const t = e.target.closest(".item .text"); if (t) { e.preventDefault(); editTaskAt(t, e.clientX, e.clientY); } });
+  let lastTap = null;
+  board.addEventListener("touchend", e => {
+    if (rd || e.changedTouches.length !== 1) { lastTap = null; return; }
+    const t = e.target.closest(".item .text");
+    if (!t || t.contentEditable === "true") { lastTap = null; return; }
+    const p = e.changedTouches[0], now = Date.now();
+    if (lastTap && lastTap.el === t && now - lastTap.time < 350 && Math.hypot(p.clientX - lastTap.x, p.clientY - lastTap.y) < 24) {
+      e.preventDefault(); lastTap = null; editTaskAt(t, p.clientX, p.clientY);
+    } else lastTap = { el: t, time: now, x: p.clientX, y: p.clientY };
+  }, { passive: false });
+  board.addEventListener("focusout", e => { const t = e.target.closest && e.target.closest(".item .text"); if (t) t.contentEditable = "false"; });
+
   // Mouse / pen: grab the grip
-  board.addEventListener("pointerdown", e => {
+  onTaskRoots("pointerdown", e => {
     if (e.pointerType === "touch" || e.button !== 0) return;
     const grip = e.target.closest(".grip");
     if (!grip) return;
@@ -1205,7 +1378,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
 
   // Touch: grip starts right away; holding anywhere else on a task starts after a short press
   let hold = null;
-  board.addEventListener("touchstart", e => {
+  onTaskRoots("touchstart", e => {
     if (e.touches.length !== 1) return;
     const t = e.touches[0];
     const li = e.target.closest(".item");
@@ -1230,7 +1403,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   };
   document.addEventListener("touchend", touchEnd, { passive: false });
   document.addEventListener("touchcancel", touchEnd, { passive: false });
-  board.addEventListener("contextmenu", e => { if (rd || hold) e.preventDefault(); });
+  onTaskRoots("contextmenu", e => { if (rd || hold) e.preventDefault(); });
 
   // Tasks always start with a capital letter
   const capText = str => str.replace(/^(\s*)(\p{Ll})/u, (m, sp, ch) => sp + ch.toUpperCase());
@@ -1266,7 +1439,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   }
 
   /* ---------- popover ---------- */
-  function closePops() { board.querySelectorAll(".pop").forEach(p => p.remove()); }
+  function closePops() { taskCardEls().forEach(c => c.querySelectorAll(".pop").forEach(p => p.remove())); }
   function openPop(card) {
     const id = card.dataset.id;
     const l = lists.get(id);
@@ -1285,6 +1458,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       card.style.setProperty("--list-color", c);
       pop.querySelectorAll(".sw").forEach(s => s.setAttribute("aria-pressed", String(s.dataset.c === c)));
       scheduleSave(id, 400);
+      renderPri();
     };
     pop.addEventListener("click", e => {
       e.stopPropagation();
@@ -1294,7 +1468,10 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
         pop.querySelector(".del-row").innerHTML = `<div class="confirm">Delete this list? <button class="yes">Delete</button><button class="no">Keep</button></div>`;
       }
       if (e.target.closest(".yes")) {
+        const l0 = lists.get(id), p = priList();
+        if (p && l0) { p.items.forEach(en => { if (en.ref && en.ref.l === id) { en.srcTitle = l0.title; en.srcColor = l0.color; } }); scheduleSave(PRI_ID); }
         lists.delete(id);
+        setTimeout(renderPri, 0);
         card.remove();
         renderEmpty();
         layout();
@@ -2141,6 +2318,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   window.addEventListener("resize", () => schedLayout());
 
   loadLocal();
+  if (!lists.has(PRI_ID)) lists.set(PRI_ID, { id: PRI_ID, title: "PRIORITIES", color: PRI_COLOR, x: 0, y: 0, z: 1, collapsed: false, created: Date.now(), items: [] });
   renderAll();
   iLoadLocal();
   renderAllIdeas();
