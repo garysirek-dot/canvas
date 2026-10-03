@@ -182,6 +182,18 @@ button:focus-visible, [contenteditable]:focus-visible { outline: 2px solid #5aa9
 .chip:hover { background: color-mix(in srgb, var(--chip) 28%, transparent); }
 .chip[aria-pressed="true"] { background: var(--chip); color: #000; }
 .chip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--chip); }
+.note-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; }
+.chip.on { padding-right: 4px; cursor: default; }
+.chip-x { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; line-height: 1; color: var(--dim); margin-left: 1px; }
+.chip-x:hover { background: rgba(255,255,255,.12); color: var(--ink); }
+.add-tag-chip { --chip: #8e8e93; background: transparent; border-style: dashed; color: var(--dim); font-weight: 600; padding: 4px 10px 4px 8px; }
+.add-tag-chip svg { width: 13px; height: 13px; }
+.add-tag-chip:hover { color: var(--ink); background: rgba(255,255,255,.05); }
+.chip.sugg { background: transparent; border-style: dashed; }
+.suggest { margin-top: 8px; }
+.pop-hint { text-transform: none; letter-spacing: 0; color: var(--faint); font-weight: 400; }
+.tag-done { display: block; width: 100%; margin-top: 12px; padding: 7px; border-radius: 8px; background: var(--card-edge); font-weight: 700; font-size: 14px; }
+.tag-done:hover { background: #45454a; }
 .chip[aria-pressed="true"] .chip-dot { background: #000; }
 .tag-pop { left: 10px; right: auto; width: 270px; max-width: calc(100vw - 48px); }
 .new-tag { display: flex; gap: 6px; }
@@ -1544,7 +1556,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     try { const a = JSON.parse(localStorage.getItem(ILS_KEY) || "[]"); if (Array.isArray(a)) a.forEach(n => ideas.set(n.id, n)); } catch (e) {}
     try { const t = JSON.parse(localStorage.getItem(TLS_KEY) || "[]"); if (Array.isArray(t)) customTags = t; } catch (e) {}
   }
-  const iclean = n => ({ id: n.id, m: typeof n.m === "number" ? n.m : null, text: n.text || "", tag: n.tag || null, color: n.color || null, x: Math.round(n.x), y: Math.round(n.y), z: n.z || 1,
+  const iclean = n => (normNote(n), { id: n.id, m: typeof n.m === "number" ? n.m : null, title: n.title, text: n.text || "", tags: n.tags.slice(), color: n.color, x: Math.round(n.x), y: Math.round(n.y), z: n.z || 1,
     collapsed: !!n.collapsed, created: n.created, updated: n.updated || n.created });
   function iScheduleSave(id, delay = 600) {
     ipending.add(id);
@@ -1591,8 +1603,17 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     } else if (e) e.remove();
   }
 
+  // Older notes had one tag that also set the color; bring them up to date (title, own color, list of tags)
+  function normNote(n) {
+    if (!Array.isArray(n.tags)) n.tags = n.tag ? [n.tag] : [];
+    if (!n.title) n.title = "NEW NOTE";
+    if (!n.color) n.color = (n.tag && tagByName(n.tag) && tagByName(n.tag).color) || NEW_CARD_COLORS[0];
+    delete n.tag;
+    return n;
+  }
+
   function renderIdea(id) {
-    const n = ideas.get(id);
+    const n = normNote(ideas.get(id));
     let card = ideaEl(id);
     if (!card) {
       card = document.createElement("article");
@@ -1600,12 +1621,13 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       card.dataset.id = id;
       card.innerHTML = `
         <header class="card-head">
-          <span class="card-grip" aria-label="Drag to reorder card" title="Drag to reorder">${icon.grip4}</span><div class="tag-btn" role="button" tabindex="0" aria-haspopup="true" title="Choose a tag"><span class="tag-name"></span>${icon.caret}</div>
-          <button class="head-btn idea-del" aria-label="Delete this note" title="Delete note">${icon.trash}</button>
-          <button class="head-btn toggle" aria-label="Collapse idea" title="Collapse or expand">${icon.chev}</button>
+          <span class="card-grip" aria-label="Drag to reorder card" title="Drag to reorder">${icon.grip4}</span><div class="title" role="heading" aria-level="2"></div>
+          <button class="head-btn color-btn" aria-label="Color and note options" title="Color and options"><span class="dot"></span></button>
+          <button class="head-btn toggle" aria-label="Collapse note" title="Collapse or expand">${icon.chev}</button>
         </header>
         <div class="card-body">
           <div class="idea-text" spellcheck="true" autocapitalize="sentences" data-ph="Type, paste, or tap the mic on your keyboard…"></div>
+          <div class="note-tags"></div>
           <div class="suggest" hidden></div>
           <div class="idea-meta"></div>
         </div>`;
@@ -1615,46 +1637,58 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       ideaBoard.appendChild(card);
       wireIdea(card);
     }
-    const color = ideaColor(n);
-    card.querySelector(".card-head").style.color = color;
-    card.style.setProperty("--list-color", color);
-    card.classList.toggle("untagged", !n.tag);
-    card.querySelector(".tag-name").textContent = n.tag ? n.tag.toUpperCase() : "TAG IT";
+    card.querySelector(".card-head").style.color = n.color;
+    card.style.setProperty("--list-color", n.color);
+    const t = card.querySelector(".title");
+    if (t.getAttribute("contenteditable") !== "true") t.textContent = n.title || "NEW NOTE";
     card.classList.toggle("collapsed", !!n.collapsed);
     const txt = card.querySelector(".idea-text");
     if (document.activeElement !== txt && txt.innerText !== n.text) txt.textContent = n.text || "";
     card.querySelector(".idea-meta").textContent = fmtWhen(n.created);
+    renderNoteTags(card, n);
     renderSuggest(card, n);
     card.style.left = n.x + "px";
     card.style.top = n.y + "px";
     card.style.zIndex = n.z || 1;
   }
 
+  const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const escapeAttr = escapeHtml;
+  const tagColor = name => (tagByName(name) || {}).color || "#8e8e93";
+
+  // Selected tags sit along the bottom of the note
+  function renderNoteTags(card, n) {
+    const box = card.querySelector(".note-tags");
+    box.innerHTML = n.tags.map(name =>
+      `<span class="chip on" style="--chip:${tagColor(name)}"><span class="chip-dot"></span>${escapeHtml(name)}<button class="chip-x" data-tag="${escapeAttr(name)}" aria-label="Remove tag ${escapeAttr(name)}">×</button></span>`).join("") +
+      `<button class="chip add-tag-chip" aria-haspopup="true">${icon.plus}${n.tags.length ? "Tag" : "Add tags"}</button>`;
+  }
   function renderSuggest(card, n) {
     const box = card.querySelector(".suggest");
-    const sugg = n.tag ? [] : suggestTags(n.text);
+    const sugg = suggestTags(n.text).filter(t => !n.tags.some(x => x.toLowerCase() === t.name.toLowerCase())).slice(0, 3);
     const key = sugg.map(t => t.name + t.color).join("|");
     if (box.dataset.key === key) return;
     box.dataset.key = key;
     if (!sugg.length) { box.hidden = true; box.textContent = ""; return; }
     box.hidden = false;
-    box.innerHTML = `<span class="suggest-label">Tag it:</span>` + sugg.map(t =>
-      `<button class="chip" data-tag="${escapeAttr(t.name)}" style="--chip:${t.color}"><span class="chip-dot"></span>${escapeHtml(t.name)}</button>`).join("");
+    box.innerHTML = `<span class="suggest-label">Suggested:</span>` + sugg.map(t =>
+      `<button class="chip sugg" data-tag="${escapeAttr(t.name)}" style="--chip:${t.color}"><span class="chip-dot"></span>${escapeHtml(t.name)}</button>`).join("");
   }
-  const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const escapeAttr = escapeHtml;
-
-  function setIdeaTag(id, tagName) {
+  function toggleNoteTag(id, name, on) {
     const n = ideas.get(id);
     if (!n) return;
-    const t = tagName ? tagByName(tagName) : null;
-    n.tag = t ? t.name : null;
-    n.color = t ? t.color : null;
+    const t = tagByName(name);
+    if (!t) return;
+    const has = n.tags.some(x => x.toLowerCase() === t.name.toLowerCase());
+    const want = on === undefined ? !has : on;
+    if (want && !has) n.tags.push(t.name);
+    if (!want && has) n.tags = n.tags.filter(x => x.toLowerCase() !== t.name.toLowerCase());
     n.updated = Date.now();
-    renderIdea(id);
     const card = ideaEl(id);
-    card.classList.remove("lp-pulse"); void card.offsetWidth; card.classList.add("lp-pulse");
-    iScheduleSave(id, 200);
+    renderNoteTags(card, n);
+    renderSuggest(card, n);
+    ideaLayout();
+    iScheduleSave(id, 300);
   }
 
   function ideaLayout() { arrange(); }
@@ -1665,76 +1699,140 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     const id = uid();
     const spot = ideaFreeSpot();
     const now = Date.now();
-    ideas.set(id, { id, text: "", tag: null, color: null, x: spot.x, y: spot.y, z: ideaTopZ(), m: nextM(), collapsed: false, created: now, updated: now });
+    const used = [...ideas.values()].map(n => n.color);
+    const color = NEW_CARD_COLORS.find(c => !used.includes(c)) || NEW_CARD_COLORS[ideas.size % NEW_CARD_COLORS.length];
+    ideas.set(id, { id, title: "NEW NOTE", text: "", tags: [], color, x: spot.x, y: spot.y, z: ideaTopZ(), m: nextM(), collapsed: false, created: now, updated: now });
     renderIdeaEmpty();
     renderIdea(id);
     ideaLayout();
     iScheduleSave(id, 50);
     const card = ideaEl(id);
     card.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    card.querySelector(".idea-text").focus();
+    noteEditTitle(card, true);
+  }
+
+  function noteEditTitle(card, selectAll) {
+    const t = card.querySelector(".title");
+    t.setAttribute("contenteditable", "true");
+    t.focus();
+    const sel = getSelection(), r = document.createRange();
+    r.selectNodeContents(t); if (!selectAll) r.collapse(false);
+    sel.removeAllRanges(); sel.addRange(r);
+  }
+  function noteCommitTitle(card) {
+    const t = card.querySelector(".title");
+    if (t.getAttribute("contenteditable") !== "true") return;
+    t.setAttribute("contenteditable", "false");
+    const n = ideas.get(card.dataset.id); if (!n) return;
+    const v = t.textContent.replace(/\s+/g, " ").trim().toUpperCase() || "NEW NOTE";
+    t.textContent = v;
+    if (v !== n.title) { n.title = v; n.updated = Date.now(); iScheduleSave(n.id); }
   }
 
   function closeTagPops() { ideaBoard.querySelectorAll(".pop").forEach(p => p.remove()); }
-  function openTagPicker(card) {
+  function placeNotePop(card, pop, anchor) {
+    const cr = card.getBoundingClientRect(), ar = anchor.getBoundingClientRect();
+    pop.style.top = (ar.bottom - cr.top + 6) + "px";
+    pop.style.left = Math.max(8, Math.min(ar.left - cr.left, card.clientWidth - pop.offsetWidth - 8)) + "px";
+    pop.style.right = "auto";
+  }
+  function openNoteOptions(card) {
     closeTagPops();
     const id = card.dataset.id, n = ideas.get(id);
-    const sugg = n.tag ? [] : suggestTags(n.text);
-    const chip = t => `<button class="chip" data-tag="${escapeAttr(t.name)}" style="--chip:${t.color}" aria-pressed="${n.tag === t.name}"><span class="chip-dot"></span>${escapeHtml(t.name)}</button>`;
+    const pop = document.createElement("div");
+    pop.className = "pop note-pop";
+    pop.innerHTML = `
+      <div class="pop-label">Card color</div>
+      <div class="swatches">${COLORS.map(c => `<button class="sw" style="background:${c}" data-c="${c}" aria-label="Color ${c}" aria-pressed="${c.toLowerCase() === (n.color || "").toLowerCase()}"></button>`).join("")}</div>
+      <label class="custom"><input type="color" id="ncolor-${id}" value="${/^#[0-9a-f]{6}$/i.test(n.color) ? n.color : "#ffffff"}">Custom color</label>
+      <hr>
+      <div class="del-row"><button class="del">Delete note</button></div>`;
+    card.appendChild(pop);
+    const apply = c => {
+      n.color = c;
+      card.querySelector(".card-head").style.color = c;
+      card.style.setProperty("--list-color", c);
+      pop.querySelectorAll(".sw").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.c === c)));
+      iScheduleSave(id, 400);
+    };
+    pop.addEventListener("pointerdown", e => e.stopPropagation());
+    pop.addEventListener("click", e => {
+      e.stopPropagation();
+      const sw = e.target.closest(".sw");
+      if (sw) apply(sw.dataset.c);
+      if (e.target.closest(".del")) pop.querySelector(".del-row").innerHTML = `<div class="confirm">Delete this note? <button class="yes">Delete</button><button class="no">Keep</button></div>`;
+      if (e.target.closest(".yes")) {
+        const snapshot = JSON.parse(JSON.stringify(n));
+        ideas.delete(id); card.remove(); renderIdeaEmpty(); ideaLayout(); iScheduleSave(id, 0);
+        showUndo("Deleted note", () => { ideas.set(id, snapshot); renderIdeaEmpty(); renderIdea(id); ideaLayout(); iScheduleSave(id, 0); });
+      }
+      if (e.target.closest(".no")) closeTagPops();
+    });
+    pop.querySelector('input[type="color"]').addEventListener("input", e => apply(e.target.value));
+  }
+  // Tag picker: tap tags to turn them on or off (several allowed), or make a new one
+  function openTagPicker(card, anchor) {
+    closeTagPops();
+    const id = card.dataset.id, n = ideas.get(id);
     const pop = document.createElement("div");
     pop.className = "pop tag-pop";
-    pop.innerHTML = `
-      ${sugg.length ? `<div class="pop-label">Suggested</div><div class="chips">${sugg.map(chip).join("")}</div><hr>` : ""}
-      <div class="pop-label">All tags</div>
-      <div class="chips">${allTags().map(chip).join("")}</div>
-      <hr>
-      <div class="pop-label">New tag</div>
-      <form class="new-tag"><input id="newtag-${id}" maxlength="24" placeholder="Tag name" autocomplete="off" autocapitalize="words"><button type="submit">Add</button></form>
-      ${n.tag ? `<hr><button class="del untag">Remove tag</button>` : ""}`;
+    const draw = () => {
+      const sugg = suggestTags(n.text);
+      const on = t => n.tags.some(x => x.toLowerCase() === t.name.toLowerCase());
+      const chip = t => `<button class="chip" data-tag="${escapeAttr(t.name)}" style="--chip:${t.color}" aria-pressed="${on(t)}"><span class="chip-dot"></span>${escapeHtml(t.name)}</button>`;
+      pop.innerHTML = `
+        ${sugg.length ? `<div class="pop-label">Suggested</div><div class="chips">${sugg.map(chip).join("")}</div><hr>` : ""}
+        <div class="pop-label">All tags <span class="pop-hint">· pick as many as you like</span></div>
+        <div class="chips">${allTags().map(chip).join("")}</div>
+        <hr>
+        <div class="pop-label">New tag</div>
+        <form class="new-tag"><input id="newtag-${id}" maxlength="24" placeholder="Tag name" autocomplete="off" autocapitalize="words"><button type="submit">Add</button></form>
+        <button class="tag-done">Done</button>`;
+      pop.querySelector(".new-tag").addEventListener("submit", e => {
+        e.preventDefault();
+        const name = pop.querySelector("input").value.replace(/\s+/g, " ").trim();
+        if (!name) return;
+        let t = tagByName(name);
+        if (!t) {
+          const TAG_COLORS = ["#FF9F80", "#C3E88D", "#80DEEA", "#F48FB1", "#FFCC80", "#A5D6A7", "#90CAF9", "#CE93D8", "#E6EE9C", "#BCAAA4"];
+          const used = allTags().map(x => x.color);
+          const color = TAG_COLORS.find(c => !used.includes(c)) || TAG_COLORS[customTags.length % TAG_COLORS.length];
+          t = { name: name.charAt(0).toUpperCase() + name.slice(1), color };
+          customTags.push(t);
+          saveTags();
+        }
+        toggleNoteTag(id, t.name, true);
+        draw();
+      });
+    };
+    draw();
     card.appendChild(pop);
+    placeNotePop(card, pop, anchor);
     pop.addEventListener("pointerdown", e => e.stopPropagation());
     pop.addEventListener("click", e => {
       e.stopPropagation();
       const c = e.target.closest(".chip");
-      if (c) { setIdeaTag(id, c.dataset.tag); closeTagPops(); }
-      if (e.target.closest(".untag")) { setIdeaTag(id, null); closeTagPops(); }
-    });
-    pop.querySelector(".new-tag").addEventListener("submit", e => {
-      e.preventDefault();
-      const name = pop.querySelector("input").value.replace(/\s+/g, " ").trim();
-      if (!name) return;
-      let t = tagByName(name);
-      if (!t) {
-        const TAG_COLORS = ["#FF9F80", "#C3E88D", "#80DEEA", "#F48FB1", "#FFCC80", "#A5D6A7", "#90CAF9", "#CE93D8", "#E6EE9C", "#BCAAA4"];
-        const used = allTags().map(x => x.color);
-        const color = TAG_COLORS.find(c => !used.includes(c)) || TAG_COLORS[customTags.length % TAG_COLORS.length];
-        t = { name: name.charAt(0).toUpperCase() + name.slice(1), color };
-        customTags.push(t);
-        saveTags();
-      }
-      setIdeaTag(id, t.name);
-      closeTagPops();
+      if (c) { toggleNoteTag(id, c.dataset.tag); c.setAttribute("aria-pressed", String(n.tags.some(x => x.toLowerCase() === c.dataset.tag.toLowerCase()))); pop.querySelectorAll(`.chip[data-tag="${CSS.escape(c.dataset.tag)}"]`).forEach(x => x.setAttribute("aria-pressed", c.getAttribute("aria-pressed"))); }
+      if (e.target.closest(".tag-done")) closeTagPops();
     });
   }
-  document.addEventListener("pointerdown", e => { if (!e.target.closest(".tag-pop") && !e.target.closest(".tag-btn")) closeTagPops(); });
+  document.addEventListener("pointerdown", e => { if (!e.target.closest(".idea-card .pop") && !e.target.closest(".add-tag-chip, .idea-card .color-btn")) closeTagPops(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeTagPops(); });
 
   function wireIdea(card) {
     const id = card.dataset.id;
     const N = () => ideas.get(id);
     const head = card.querySelector(".card-head");
-    const tagBtn = card.querySelector(".tag-btn");
+    const title = card.querySelector(".title");
     const txt = card.querySelector(".idea-text");
 
-    // drag by the header (computer / iPad); tap the tag title to pick a tag
+    // drag by the header (computer / iPad); tap the title to rename
     let drag = null;
     head.addEventListener("pointerdown", e => {
-      if (e.button !== 0 || e.target.closest("button")) return;
-      const onTag = !!e.target.closest(".tag-btn");
-      if (isPhone()) return;
+      if (e.button !== 0 || e.target.closest("button") || title.getAttribute("contenteditable") === "true" || isPhone()) return;
       e.preventDefault();
       const n = N();
-      drag = { pid: e.pointerId, sx: e.clientX, sy: e.clientY, ox: n.x, oy: n.y, moved: false, onTag };
+      drag = { pid: e.pointerId, sx: e.clientX, sy: e.clientY, ox: n.x, oy: n.y, moved: false, onTitle: !!e.target.closest(".title") };
       head.setPointerCapture(e.pointerId);
     });
     head.addEventListener("pointermove", e => {
@@ -1757,24 +1855,22 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       const d = drag; drag = null;
       card.classList.remove("dragging");
       if (d.moved) { iScheduleSave(id, 200); ideaLayout(); }
-      else if (d.onTag && e.type === "pointerup") { if (card.querySelector(".tag-pop")) closeTagPops(); else openTagPicker(card); }
+      else if (d.onTitle && e.type === "pointerup") noteEditTitle(card, false);
     };
     head.addEventListener("pointerup", endDrag);
     head.addEventListener("pointercancel", endDrag);
-    tagBtn.addEventListener("click", () => { if (isPhone()) { if (card.querySelector(".tag-pop")) closeTagPops(); else openTagPicker(card); } });
-    tagBtn.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openTagPicker(card); } });
+    title.addEventListener("click", () => { if (isPhone() && title.getAttribute("contenteditable") !== "true") noteEditTitle(card, false); });
+    title.addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); noteCommitTitle(card); if (!N().collapsed) setCaret(txt, txt.textContent.length); }
+      else if (e.key === "Escape") title.blur();
+    });
+    title.addEventListener("blur", () => noteCommitTitle(card));
+    title.addEventListener("paste", plainPaste);
 
     card.querySelector(".toggle").addEventListener("click", () => {
       const n = N(); n.collapsed = !n.collapsed; renderIdea(id); ideaLayout(); iScheduleSave(id, 200);
     });
-    card.querySelector(".idea-del").addEventListener("click", () => {
-      const snapshot = { ...N() };
-      ideas.delete(id);
-      card.remove();
-      renderIdeaEmpty(); ideaLayout();
-      iScheduleSave(id, 0);
-      showUndo("Deleted note", () => { ideas.set(id, snapshot); renderIdeaEmpty(); renderIdea(id); ideaLayout(); iScheduleSave(id, 0); });
-    });
+    card.querySelector(".color-btn").addEventListener("click", e => { e.stopPropagation(); if (card.querySelector(".note-pop")) closeTagPops(); else openNoteOptions(card); });
 
     let suggT;
     txt.addEventListener("input", e => {
@@ -1793,11 +1889,17 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       document.execCommand("insertText", false, (e.clipboardData || window.clipboardData).getData("text/plain"));
     });
     txt.addEventListener("blur", () => { renderSuggest(card, N()); ideaLayout(); });
-    card.querySelector(".suggest").addEventListener("pointerdown", e => { if (e.target.closest(".chip")) e.preventDefault(); });
-    card.querySelector(".suggest").addEventListener("click", e => {
-      const c = e.target.closest(".chip");
-      if (c) setIdeaTag(id, c.dataset.tag);
+
+    const tagsBox = card.querySelector(".note-tags");
+    tagsBox.addEventListener("click", e => {
+      const x = e.target.closest(".chip-x");
+      if (x) { e.stopPropagation(); toggleNoteTag(id, x.dataset.tag, false); return; }
+      const add = e.target.closest(".add-tag-chip");
+      if (add) { e.stopPropagation(); if (card.querySelector(".tag-pop")) closeTagPops(); else openTagPicker(card, add); }
     });
+    const sug = card.querySelector(".suggest");
+    sug.addEventListener("pointerdown", e => { if (e.target.closest(".chip")) e.preventDefault(); });
+    sug.addEventListener("click", e => { const c = e.target.closest(".chip"); if (c) toggleNoteTag(id, c.dataset.tag, true); });
   }
 
   function renderAllIdeas() {
