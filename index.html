@@ -162,10 +162,14 @@ body.searching .card.search-hit.collapsed .card-head { border-bottom-color: curr
 .bic-text:focus { border-bottom-color: var(--faint); text-overflow: clip; overflow-x: auto; scrollbar-width: none; }
 .bic-text::-webkit-scrollbar { display: none; }
 .sched-meta { margin-top: 8px; font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
-.pop-action { display: block; width: 100%; text-align: left; font-size: 14px; padding: 2px 0; color: var(--ink); }
-.pop-action:hover { color: var(--list-color); }
-.pop-action.dup { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.pop-action.dup svg { width: 16px; height: 16px; flex: none; }
+.pop-menu { display: flex; flex-direction: column; gap: 1px; margin: 0 -6px; }
+.pop-action { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; font-size: 14px; padding: 7px 8px; border-radius: 7px; color: var(--ink); }
+.pop-action:hover { background: rgba(255,255,255,.07); }
+.pop-action svg { width: 16px; height: 16px; flex: none; color: var(--dim); }
+.pop-action:hover svg { color: var(--ink); }
+.pop-action.danger, .pop-action.danger svg { color: var(--danger); }
+.pop-action.danger:hover { background: color-mix(in srgb, var(--danger) 12%, transparent); }
+.pop-menu .del-row .confirm { padding: 6px 8px; }
 .status-pop { width: 170px; padding: 6px; display: flex; flex-direction: column; gap: 2px; }
 .status-opt { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 7px; font-size: 14px; text-align: left; }
 .status-opt:hover, .status-opt[aria-pressed="true"] { background: rgba(255,255,255,.07); }
@@ -210,7 +214,27 @@ body.searching .card.search-hit.collapsed .card-head { border-bottom-color: curr
 .nb-list li { display: flex; align-items: baseline; gap: 8px; padding-left: 4px; }
 .nb-list li::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--list-color); transform: translateY(-2px); }
 .nb-item { flex: 1; }
-.nbw-actions { padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,.035); border-left: 3px solid var(--list-color); }
+.note-actions { margin: 12px -4px 0; }
+.note-actions[hidden] { display: none; }
+.note-actions.row-hit { border-radius: 8px; }
+.nbw-actions { padding: 10px 12px 8px; border-radius: 8px; background: #232325; border-left: 3px solid var(--list-color); }
+.nbw-actions > .nb-x { top: 4px; right: 4px; }
+.nbw-actions .nb-list li { align-items: flex-start; padding-left: 0; }
+.nbw-actions .nb-list li::before { display: none; }
+.nb-check { flex: none; width: 17px; height: 17px; margin-top: 2.5px; border-radius: 5px; border: 1.6px solid var(--list-color); display: grid; place-items: center; color: #000; transition: background .12s; }
+.nb-check svg { width: 12px; height: 12px; opacity: 0; }
+.nb-check[aria-checked="true"] { background: var(--list-color); }
+.nb-check[aria-checked="true"] svg { opacity: 1; }
+.nbw-actions li.done .nb-item { text-decoration: line-through; opacity: .5; }
+.nbw-actions li.done .nb-who { opacity: .5; }
+.nb-act-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+.nb-act-foot .nb-more { margin-top: 0; }
+.act-send { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 8px; font-size: 12.5px; font-weight: 700; color: var(--list-color); background: color-mix(in srgb, var(--list-color) 14%, transparent); }
+.act-send:hover { background: color-mix(in srgb, var(--list-color) 24%, transparent); }
+.act-send svg { width: 15px; height: 15px; flex: none; }
+.act-send:disabled { opacity: .4; cursor: default; }
+.act-send[data-mode="open"] { background: transparent; color: var(--dim); font-weight: 600; }
+.act-send[data-mode="open"]:hover { color: var(--ink); background: rgba(255,255,255,.06); }
 .nb-act-title { font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--list-color); margin-bottom: 6px; padding-right: 18px; }
 .nbw-actions .nb-list li::before { border-radius: 2px; width: 7px; height: 7px; }
 .nb-who { flex: none; width: 84px; font-size: 13px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px dashed transparent; }
@@ -232,7 +256,29 @@ body.searching .card.search-hit.collapsed .card-head { border-bottom-color: curr
 .nb-linkform input { flex: 1 1 140px; min-width: 0; background: #2a2a2c; border: 1px solid var(--card-edge); border-radius: 7px; padding: 6px 8px; color: var(--ink); font: inherit; font-size: 14px; }
 .nb-linkform input:focus { outline: none; border-color: var(--list-color); }
 .nb-linkform button { padding: 6px 12px; border-radius: 7px; background: var(--list-color); color: #000; font-weight: 700; font-size: 13px; }
-.note-tools { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; opacity: 0; transition: opacity .15s; }
+.note-tools { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 2px; margin-top: 8px; opacity: 0; transition: opacity .15s; }
+.nt-group { display: inline-flex; gap: 1px; }
+.note-tools .ico { padding: 5px 6px; }
+.note-tools .ico span { display: none; }
+.note-tools .nt-act { margin-left: auto; color: var(--list-color); }
+.note-tools .nt-act:hover { color: var(--list-color); }
+.nt-sep { width: 1px; height: 18px; margin: 0 5px; background: var(--card-edge); }
+.note-tools .fmt { justify-content: center; min-width: 28px; padding: 4px 6px; font-size: 14px; line-height: 1; }
+.note-tools .fmt b, .note-tools .fmt i, .note-tools .fmt u { font-size: 15px; font-family: inherit; }
+.note-tools .fmt i { font-family: Georgia, "Times New Roman", serif; font-weight: 700; }
+.note-tools .fmt-style { gap: 1px; padding-right: 3px; font-weight: 700; }
+.note-tools .fmt-style svg { width: 12px; height: 12px; }
+.note-tools .fmt[aria-pressed="true"] { background: color-mix(in srgb, var(--list-color) 26%, transparent); color: var(--ink); }
+.note-tools .fmt[aria-expanded="true"] { background: rgba(255,255,255,.09); color: var(--ink); }
+.fmt-pop { top: calc(100% + 6px); left: 0; right: auto; width: 252px; z-index: 30; }
+.fmt-pop .fmt-gap { margin-top: 12px; }
+.fmt-sizes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.note-tools .fmt-sizes button { justify-content: center; padding: 7px 2px; border-radius: 7px; background: rgba(255,255,255,.05); color: var(--ink); font-weight: 600; line-height: 1.1; }
+.fmt-colors { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.note-tools .fmt-colors button { aspect-ratio: 1; width: 100%; padding: 0; border-radius: 50%; background: var(--c); }
+.note-tools .fmt-colors button:hover { background: var(--c); box-shadow: 0 0 0 2px var(--pop), 0 0 0 3.5px var(--ink); }
+.note-tools .fmt-colors button.is-default { background: linear-gradient(135deg, transparent 44%, var(--ink) 44% 56%, transparent 56%); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.nb-rich b { font-weight: 700; }
 .idea-card:hover .note-tools, .idea-card:focus-within .note-tools { opacity: 1; }
 .note-tools button { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 7px; font-size: 12px; font-weight: 600; color: var(--dim); }
 .note-tools button:hover { background: rgba(255,255,255,.07); color: var(--ink); }
@@ -404,6 +450,127 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
 .confirm button { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--card-edge); color: var(--ink); font-size: 13px; }
 .confirm .yes { background: var(--danger); border-color: var(--danger); color: #000; font-weight: 700; }
 
+/* boxes */
+.box-btn { position: relative; flex: none; }
+.box-btn svg { width: 20px; height: 20px; }
+body.boxes-open .box-btn { background: #3a3a3d; }
+.box-count { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--ink); color: #000; font-size: 11px; font-weight: 800; line-height: 18px; text-align: center; font-variant-numeric: tabular-nums; }
+.box-count[hidden] { display: none; }
+.box-btn.box-pulse { animation: boxPulse .5s ease; }
+@keyframes boxPulse { 0% { transform: scale(1); } 40% { transform: scale(1.18); background: #4a4a4e; } 100% { transform: scale(1); } }
+.card.filing { transition: transform .22s ease, opacity .22s ease; transform: scale(.85) translateY(-16px); opacity: 0; pointer-events: none; }
+.search-boxed { font-size: 12px; font-weight: 700; color: var(--ink); white-space: nowrap; padding: 3px 8px; border-radius: 7px; background: rgba(255,255,255,.08); flex: none; }
+.search-boxed:hover { background: rgba(255,255,255,.14); }
+.search-boxed[hidden] { display: none; }
+.pop.box-pop { width: 248px; }
+.bx-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; max-height: 260px; overflow-y: auto; }
+.bx-pick { display: flex; align-items: center; gap: 9px; padding: 8px; border-radius: 8px; text-align: left; font-weight: 600; font-size: 14px; color: var(--ink); }
+.bx-pick:hover { background: rgba(255,255,255,.07); }
+.bx-pick svg { width: 18px; height: 18px; color: var(--bc); flex: none; }
+.bx-pick span:first-of-type { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.bx-k { font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.bx-new { display: flex; gap: 6px; }
+.bx-new input { flex: 1; min-width: 0; background: #2a2a2c; border: 1px solid var(--card-edge); border-radius: 7px; padding: 6px 8px; color: var(--ink); font: inherit; font-size: 14px; }
+.bx-new input:focus { outline: none; border-color: var(--dim); }
+.bx-new button { padding: 6px 11px; border-radius: 7px; background: var(--ink); color: #000; font-weight: 700; font-size: 13px; }
+.bx-note { margin: 10px 0 0; font-size: 12px; line-height: 1.4; color: var(--dim); }
+.box-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 420px; max-width: 100vw; z-index: 99999; background: #161617; border-left: 1px solid var(--card-edge); border-top: 1px solid var(--card-edge); border-top-left-radius: 14px; box-shadow: -20px 0 50px rgba(0,0,0,.6); display: flex; flex-direction: column; animation: bpIn .18s ease; }
+.box-panel[hidden] { display: none; }
+@keyframes bpIn { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.bp-head { display: flex; align-items: center; gap: 6px; padding: 18px 14px 12px 16px; }
+.bp-title { flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 18px; letter-spacing: .08em; text-transform: uppercase; }
+.bp-title > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bp-h-icon { display: grid; flex: none; } .bp-h-icon svg { width: 22px; height: 22px; }
+.bp-renameform { flex: 1; } .bp-rename-in { width: 100%; background: #2a2a2c; border: 1px solid currentColor; border-radius: 8px; padding: 6px 9px; color: inherit; font: inherit; font-size: 17px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; outline: none; }
+.bp-back, .bp-x { width: 34px; height: 34px; border-radius: 9px; color: var(--dim); display: grid; place-items: center; font-size: 24px; line-height: 1; flex: none; }
+.bp-back:hover, .bp-x:hover { background: rgba(255,255,255,.08); color: var(--ink); }
+.bp-back svg { width: 22px; height: 22px; }
+.bp-back[hidden] { display: none; }
+.bp-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 0 16px 12px; }
+.bp-tools[hidden] { display: none; }
+.bp-tool { font-size: 12.5px; font-weight: 600; color: var(--dim); padding: 5px 10px; border-radius: 7px; background: rgba(255,255,255,.06); }
+.bp-tool:hover { color: var(--ink); background: rgba(255,255,255,.1); }
+.bp-tool.bp-del:hover { color: var(--danger); }
+.bp-colors { display: flex; gap: 7px; flex-wrap: wrap; flex-basis: 100%; padding: 4px 2px 0; }
+.bp-tool.bp-del { margin-left: auto; }
+.bp-color { width: 18px; height: 18px; border-radius: 50%; }
+.bp-color[aria-pressed="true"] { box-shadow: 0 0 0 2px #161617, 0 0 0 3.5px var(--ink); }
+.bp-confirm { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
+.bp-confirm button { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--card-edge); color: var(--ink); font-size: 13px; }
+.bp-confirm .bp-del-yes { background: var(--danger); border-color: var(--danger); color: #000; font-weight: 700; }
+.bp-searchrow { display: flex; align-items: center; gap: 8px; margin: 0 16px 12px; padding: 0 10px; background: var(--card); border: 1px solid var(--card-edge); border-radius: 10px; color: var(--dim); }
+.bp-searchrow:focus-within { border-color: var(--dim); }
+.bp-searchrow svg { width: 17px; height: 17px; flex: none; }
+.bp-search { flex: 1; min-width: 0; background: transparent; border: 0; outline: none; color: var(--ink); font: inherit; font-size: 15px; padding: 9px 0; }
+.bp-search::-webkit-search-cancel-button { display: none; }
+.bp-body { flex: 1; overflow-y: auto; padding: 2px 16px 28px; display: flex; flex-direction: column; gap: 8px; overscroll-behavior: contain; }
+.bp-count { font-size: 12px; color: var(--faint); letter-spacing: .02em; margin: 2px 2px 0; }
+.bp-boxrow { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--card-edge); text-align: left; color: var(--ink); transition: border-color .15s; }
+.bp-boxrow:hover { border-color: color-mix(in srgb, var(--bc) 70%, transparent); }
+.bp-boxicon { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; flex: none; color: var(--bc); background: color-mix(in srgb, var(--bc) 16%, transparent); }
+.bp-boxicon svg { width: 21px; height: 21px; }
+.bp-boxname { flex: 1; min-width: 0; font-weight: 700; font-size: 15px; letter-spacing: .05em; text-transform: uppercase; overflow-wrap: anywhere; }
+.bp-boxcount { font-size: 13px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.bp-chev { width: 16px; height: 16px; color: var(--faint); flex: none; }
+.bp-new { display: flex; align-items: center; gap: 8px; padding: 11px 12px; border-radius: 12px; border: 1px dashed var(--card-edge); color: var(--dim); font-weight: 600; font-size: 14px; }
+.bp-new:hover { color: var(--ink); border-color: var(--dim); }
+.bp-new svg { width: 16px; height: 16px; }
+.bp-newform { display: flex; gap: 6px; }
+.bp-newform input { flex: 1; min-width: 0; background: var(--card); border: 1px solid var(--dim); border-radius: 10px; padding: 9px 11px; color: var(--ink); font: inherit; font-size: 15px; outline: none; }
+.bp-newform button[type="submit"] { padding: 0 14px; border-radius: 10px; background: var(--ink); color: #000; font-weight: 700; }
+.bp-cancel { width: 38px; border-radius: 10px; color: var(--dim); font-size: 20px; }
+.bp-hint { margin: 6px 2px; font-size: 13.5px; line-height: 1.5; color: var(--dim); }
+.bp-hint b { color: var(--ink); font-weight: 600; }
+.bp-note { background: var(--card); border: 1px solid var(--card-edge); border-left: 3px solid var(--c); border-radius: 10px; }
+.bp-note-main { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; width: 100%; text-align: left; padding: 10px 12px 4px; color: var(--ink); }
+.bp-note-title { font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--c); min-width: 0; overflow-wrap: anywhere; }
+.bp-note-date { grid-column: 2; grid-row: 1; font-size: 12px; color: var(--faint); white-space: nowrap; padding-top: 1px; }
+.bp-note-box { grid-column: 1 / -1; display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--bc); }
+.bp-note-box svg { width: 13px; height: 13px; }
+.bp-note-snip { grid-column: 1 / -1; font-size: 13.5px; line-height: 1.4; color: var(--dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.bp-note-snip em { color: var(--faint); }
+.bp-preview { display: flex; flex-direction: column; gap: 7px; padding: 4px 12px 6px; font-size: 14px; line-height: 1.45; color: var(--ink); }
+.rd-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.rd-list { margin: 0; padding-left: 18px; } .rd-list li::marker { color: var(--c); }
+.rd-table { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--card-edge); border-radius: 8px; overflow: hidden; font-size: 13px; }
+.rd-table > div { padding: 5px 8px; border-top: 1px solid var(--card-edge); min-height: 1.4em; overflow-wrap: anywhere; }
+.rd-table > div:nth-child(odd) { border-right: 1px solid var(--card-edge); }
+.rd-table > .rd-head { border-top: 0; font-weight: 700; background: color-mix(in srgb, var(--c) 14%, transparent); }
+.rd-link { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; max-width: 100%; color: var(--c); font-weight: 600; padding: 4px 9px 4px 7px; border-radius: 7px; background: color-mix(in srgb, var(--c) 12%, transparent); text-decoration: none; }
+.rd-link svg { width: 14px; height: 14px; flex: none; } .rd-link span { text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rd-actions { border-left: 3px solid var(--c); background: #232325; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+.rd-act-title { font-weight: 700; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--c); }
+.rd-act { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; }
+.rd-box { flex: none; width: 15px; height: 15px; margin-top: 2px; border-radius: 4px; border: 1.5px solid var(--c); display: grid; place-items: center; }
+.rd-act.done .rd-box { background: var(--c); } .rd-box svg { width: 10px; height: 10px; }
+.rd-act-t { flex: 1; min-width: 0; } .rd-act.done .rd-act-t { text-decoration: line-through; opacity: .55; }
+.rd-who { font-size: 12.5px; color: var(--dim); }
+.rd-empty { color: var(--faint); font-style: italic; }
+.bp-note-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 4px 8px 8px 12px; }
+.bp-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; color: var(--ink); padding: 2px 8px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--chip) 45%, transparent); }
+.bp-tag .chip-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--chip); }
+.bp-acts { font-size: 11.5px; color: var(--dim); }
+.bp-restore { margin-left: auto; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 8px; font-size: 12.5px; font-weight: 700; color: var(--c); background: color-mix(in srgb, var(--c) 13%, transparent); }
+.bp-restore:hover { background: color-mix(in srgb, var(--c) 24%, transparent); }
+.bp-restore svg { width: 14px; height: 14px; }
+@media (max-width: 699px) {
+  .box-panel { width: 100vw; border-left: 0; border-top: 0; border-radius: 0; z-index: 100000; padding-top: env(safe-area-inset-top, 0px); }
+  .bp-search, .bp-newform input, .bp-rename-in, .bx-new input { font-size: 16px; }
+  .bp-color { width: 22px; height: 22px; }
+  .search-boxed { padding: 3px 6px; }
+  .topbar.topbar { flex-wrap: nowrap; gap: 10px; padding-left: 14px; padding-right: 14px; }
+  .top-right.top-right { flex: none; }
+  .brand-text { min-width: 0; }
+  .top-right.top-right { gap: clamp(5px, 1.8vw, 8px); }
+  .topbar .add-list { width: clamp(32px, 9.4vw, 38px); height: clamp(32px, 9.4vw, 38px); }
+  .topbar .add-list svg { width: clamp(16px, 4.6vw, 19px); height: clamp(16px, 4.6vw, 19px); }
+  .brand.brand { gap: clamp(6px, 2.2vw, 9px); min-width: 0; flex: 0 1 auto; }
+  .brand-icon.brand-icon { height: clamp(34px, 12.6vw, 52px); }
+  .brand .brand-name { font-size: clamp(17px, 5.9vw, 24px); }
+  .brand-sub.brand-sub { font-size: clamp(11px, 3.65vw, 15px); letter-spacing: 0; white-space: nowrap; margin-top: 1px; }
+  .brand-text { overflow: hidden; }
+  .brand-sub { overflow: hidden; text-overflow: ellipsis; }
+}
 .status { position: fixed; left: 20px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); font-size: 12px; color: var(--faint); z-index: 100000; }
 
 /* iPhone: one stacked column */
@@ -441,6 +608,11 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   .ms-text, .bic-text, .nb-edit, .nb-linkform input, .new-tag input, .tag-pop input { font-size: 16px; }
   .nb-who { width: 76px; }
   .note-tools button span { display: none; }
+  .note-tools .fmt { min-width: 32px; }
+  .note-tools button, .note-tools .ico { padding: 6px 7px; }
+  .nt-sep { margin: 0 3px; }
+  .fmt-pop { width: min(280px, calc(100vw - 72px)); }
+  .note-tools .fmt-sizes button { padding: 9px 2px; }
   .note-tools button { padding: 6px 9px; }
   .note-tools svg { width: 18px; height: 18px; }
   .bic { width: 76px; }
@@ -454,10 +626,12 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   <div class="brand"><img class="brand-icon" alt="" src="data:image/png;base64,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"><div class="brand-text"><span class="brand-name">Canvas</span><span class="brand-sub">Create Productivity</span></div></div>
   <div class="top-right">
   <span class="brand-tag">Create a Task, Schedule, or Note Card - Drag them anywhere - Have fun with it!</span>
+  <button class="add-list box-btn" id="boxesBtn" aria-label="Boxes" title="Boxes" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/></svg><span class="box-count" hidden></span></button>
   <div class="search-wrap">
     <div class="search-box" id="searchBox" hidden>
       <input id="searchInput" type="search" placeholder="Search all cards…" autocomplete="off" aria-label="Search all cards">
       <span class="search-count" id="searchCount" aria-live="polite"></span>
+      <button class="search-boxed" id="searchBoxed" hidden></button>
       <div class="search-mode" role="group" aria-label="Show results as">
         <button data-mode="filter" aria-pressed="true">Only matches</button><button data-mode="highlight" aria-pressed="false">Highlight</button>
       </div>
@@ -537,9 +711,10 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   }
   function clean(l) {
     return { id: l.id, title: l.title, color: l.color, x: Math.round(l.x), y: Math.round(l.y), z: l.z, m: typeof l.m === "number" ? l.m : null, collapsed: !!l.collapsed, highlight: !!l.highlight, created: l.created,
-      items: l.items.map(i => { const o = { id: i.id, text: i.text, done: !!i.done, indent: i.indent ? 1 : 0, bic: i.bic || "", status: i.done ? "Done" : (i.status || "Not Started"), prev: i.prev || null }; if (i.ref) { o.ref = { l: i.ref.l, i: i.ref.i }; if (i.srcTitle) o.srcTitle = i.srcTitle; if (i.srcColor) o.srcColor = i.srcColor; } return o; }) };
+      items: l.items.map(i => { const o = { id: i.id, text: i.text, done: !!i.done, indent: i.indent ? 1 : 0, bic: i.bic || "", status: i.done ? "Done" : (i.status || "Not Started"), prev: i.prev || null }; if (i.ref) { o.ref = { l: i.ref.l, i: i.ref.i }; if (i.srcTitle) o.srcTitle = i.srcTitle; if (i.srcColor) o.srcColor = i.srcColor; } if (i.link && i.link.n) o.link = { n: i.link.n, a: i.link.a }; return o; }) };
   }
   function scheduleSave(id, delay = 500) {
+    try { syncListToNotes(id); } catch (e) {}
     pending.add(id);
     saveLocal();
     clearTimeout(timers.get(id));
@@ -580,15 +755,21 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   function renderEmpty() {
     let e = canvasEl.querySelector(".empty");
     let total = userLists().length;
-    try { total += ideas.size + scheds.size; } catch (err) {}
+    try { ideas.forEach(n => { if (!n.box) total++; }); total += scheds.size; } catch (err) {}
     if (total === 0) {
       if (!e) {
         e = document.createElement("div");
         e.className = "empty";
         e.innerHTML = "<strong>Nothing here yet</strong>Tap the + button at the top right to add a Task, Schedule or Note card.";
+        e.dataset.k = "";
         canvasEl.appendChild(e);
       }
     } else if (e) e.remove();
+    if (e && total === 0) {
+      let filed = 0; try { ideas.forEach(n => { if (n.box) filed++; }); } catch (err) {}
+      const k = String(filed);
+      if (e.dataset.k !== k) { e.dataset.k = k; e.innerHTML = filed ? `<strong>All clear</strong>Your ${filed} filed note${filed > 1 ? "s are" : " is"} in Boxes (the box button at the top). Tap + to add a new card.` : "<strong>Nothing here yet</strong>Tap the + button at the top right to add a Task, Schedule or Note card."; }
+    }
   }
 
   function cardEl(id) { return (isPri(id) ? priBar : board).querySelector(`.card[data-id="${id}"]`); }
@@ -599,7 +780,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   function allCards() {
     const out = [];
     userLists().forEach(l => out.push({ o: l, el: cardEl(l.id), w: CARD_W, save: () => scheduleSave(l.id, 200) }));
-    try { ideas.forEach(n => out.push({ o: n, el: ideaEl(n.id), w: CARD_W, save: () => iScheduleSave(n.id, 200) })); } catch (e) {}
+    try { ideas.forEach(n => { if (!n.box) out.push({ o: n, el: ideaEl(n.id), w: CARD_W, save: () => iScheduleSave(n.id, 200) }); }); } catch (e) {}
     try { const sw = schedW() || CARD_W; scheds.forEach(s => out.push({ o: s, el: schedEl(s.id), w: sw, save: () => sScheduleSave(s.id, 200) })); } catch (e) {}
     return out;
   }
@@ -1736,8 +1917,10 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       <div class="swatches">${COLORS.map(c => `<button class="sw" style="background:${c}" data-c="${c}" aria-label="Color ${c}" aria-pressed="${c.toLowerCase() === (l.color || "").toLowerCase()}"></button>`).join("")}</div>
       <label class="custom"><input type="color" id="custom-${id}" value="${/^#[0-9a-f]{6}$/i.test(l.color) ? l.color : "#ffffff"}">Custom color</label>
       <hr>
-      <button class="pop-action dup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6A2.5 2.5 0 0 0 13 3.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg>Duplicate card</button>
-      <div class="del-row"><button class="del">Delete list</button></div>`;
+      <div class="pop-menu">
+        <button class="pop-action dup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6A2.5 2.5 0 0 0 13 3.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg>Duplicate card</button>
+        <div class="del-row"><button class="pop-action danger del">${icon.trash}Delete list</button></div>
+      </div>`;
     card.appendChild(pop);
     const apply = c => {
       l.color = c;
@@ -1820,9 +2003,10 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     try { const a = JSON.parse(localStorage.getItem(ILS_KEY) || "[]"); if (Array.isArray(a)) a.forEach(n => ideas.set(n.id, n)); } catch (e) {}
     try { const t = JSON.parse(localStorage.getItem(TLS_KEY) || "[]"); if (Array.isArray(t)) customTags = t; } catch (e) {}
   }
-  const iclean = n => (normNote(n), { id: n.id, m: typeof n.m === "number" ? n.m : null, title: n.title, text: noteText(n), blocks: cloneBlocks(n.blocks), tags: n.tags.slice(), color: n.color, x: Math.round(n.x), y: Math.round(n.y), z: n.z || 1,
+  const iclean = n => (normNote(n), { id: n.id, m: typeof n.m === "number" ? n.m : null, title: n.title, text: noteText(n), blocks: cloneBlocks(n.blocks), actions: cloneActions(n.actions), box: n.box || null, filedAt: n.filedAt || null, tags: n.tags.slice(), color: n.color, x: Math.round(n.x), y: Math.round(n.y), z: n.z || 1,
     collapsed: !!n.collapsed, created: n.created, updated: n.updated || n.created });
   function iScheduleSave(id, delay = 600) {
+    try { syncNoteToLists(id); } catch (e) {}
     ipending.add(id);
     iSaveLocal();
     clearTimeout(itimers.get(id));
@@ -1873,13 +2057,33 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     if (!n.title) n.title = "NEW NOTE";
     if (!n.color) n.color = (n.tag && tagByName(n.tag) && tagByName(n.tag).color) || NEW_CARD_COLORS[0];
     if (!Array.isArray(n.blocks) || !n.blocks.length) n.blocks = [{ id: uid(), type: "text", text: n.text || "" }];
+    if (n.blocks.some(b => b.type === "actions")) {
+      n.blocks.filter(b => b.type === "actions").forEach(b => {
+        if (!n.actions) n.actions = { id: b.id, type: "actions", title: b.title || "ACTION ITEMS", items: [] };
+        n.actions.items.push(...(b.items || []));
+      });
+      const kept = [];
+      n.blocks.filter(b => b.type !== "actions").forEach(b => {
+        const prev = kept[kept.length - 1];
+        if (prev && prev.type === "text" && b.type === "text") {
+          prev.text = [prev.text, b.text].filter(Boolean).join("\n");
+          if (prev.html != null || b.html != null) prev.html = [prev.html != null ? prev.html : escapeHtml(prev.text || ""), b.html != null ? b.html : escapeHtml(b.text || "")].filter(Boolean).join("<br>");
+        } else kept.push(b);
+      });
+      n.blocks = kept.length ? kept : [{ id: uid(), type: "text", text: "" }];
+      if (n.actions && !n.actions.items.length) n.actions.items.push({ id: uid(), text: "", who: "" });
+    }
+    if (n.actions && !n.actions.type) n.actions.type = "actions";
+    if (n.actions && !Array.isArray(n.actions.items)) n.actions = null;
     delete n.tag;
     return n;
   }
 
   /* ----- note body: text, bullet lists, 2-column tables, action items, links ----- */
   const NB_TYPES = { bullets: "Bullets", table: "Table", actions: "Action items", link: "Link" };
-  function noteText(n) {
+  const actionsText = n => n.actions ? [n.actions.title || "Action items", ...(n.actions.items || []).map(i => (i.text || "") + " " + (i.who || ""))].join("\n") : "";
+  function noteText(n) { return [blocksText(n), actionsText(n)].filter(Boolean).join("\n").trim(); }
+  function blocksText(n) {
     return (n.blocks || []).map(b => {
       if (b.type === "text") return b.text || "";
       if (b.type === "bullets") return (b.items || []).map(i => i.text).join("\n");
@@ -1895,9 +2099,119 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     if (fresh) { c.id = uid(); (c.items || []).forEach(i => (i.id = uid())); (c.rows || []).forEach(r => (r.id = uid())); }
     return c;
   });
+  const cloneActions = (a, fresh) => {
+    if (!a) return null;
+    const c = JSON.parse(JSON.stringify(a));
+    if (fresh) { c.id = uid(); delete c.taskList; (c.items || []).forEach(i => (i.id = uid())); }
+    return c;
+  };
+  /* ----- rich text: bold, italic, underline, color, size (only these survive saving) ----- */
+  const RICH_COLORS = [["Default", ""], ["Red", "#FF6B6B"], ["Orange", "#FFA94D"], ["Yellow", "#FFD84D"], ["Green", "#5FD68A"], ["Blue", "#5AA9FF"], ["Purple", "#B197FC"], ["Grey", "#8E8E93"]];
+  const RICH_SIZES = [["Small", 2, ".85em"], ["Normal", 3, ""], ["Large", 4, "1.2em"], ["Huge", 5, "1.5em"]];
+  const DEFAULT_MARK = "#010203";
+  const cssColor = c => { const d = document.createElement("span"); d.style.color = ""; d.style.color = c || ""; return d.style.color.replace(/\s+/g, ""); };
+  let richRgb = null;
+  const paletteColor = c => {
+    if (!c) return "";
+    if (!richRgb) richRgb = new Map(RICH_COLORS.filter(x => x[1]).map(x => [cssColor(x[1]), x[1]]));
+    return richRgb.get(cssColor(c)) || "";
+  };
+  const FONT_SIZE_ATTR = { 1: ".85em", 2: ".85em", 3: "", 4: "1.2em", 5: "1.5em", 6: "1.5em", 7: "1.5em" };
+  const richSize = v => {
+    v = String(v || "").trim().toLowerCase();
+    if (v === "x-small" || v === "small" || v === "0.85em" || v === ".85em" || v === "smaller") return ".85em";
+    if (v === "large" || v === "1.2em" || v === "larger") return "1.2em";
+    if (v === "x-large" || v === "xx-large" || v === "xxx-large" || v === "1.5em") return "1.5em";
+    return "";
+  };
+  // the allowed style of a span/font element, as a clean style string
+  function richStyle(nd) {
+    const d = document.createElement("span");
+    d.setAttribute("style", nd.getAttribute("style") || "");
+    const isFont = nd.tagName === "FONT";
+    const parts = [];
+    const color = paletteColor(d.style.color || (isFont ? nd.getAttribute("color") : ""));
+    if (color) parts.push("color:" + color);
+    const size = d.style.fontSize ? richSize(d.style.fontSize) : (isFont && nd.getAttribute("size") ? FONT_SIZE_ATTR[nd.getAttribute("size")] || "" : "");
+    if (size) parts.push("font-size:" + size);
+    const fw = d.style.fontWeight; if (fw === "bold" || fw === "bolder" || +fw >= 600) parts.push("font-weight:700");
+    if (d.style.fontStyle === "italic") parts.push("font-style:italic");
+    if (/underline/.test(d.style.textDecorationLine || d.style.textDecoration || "")) parts.push("text-decoration:underline");
+    return parts.join(";");
+  }
+  function cleanRich(html) {
+    const tpl = document.createElement("template");
+    tpl.innerHTML = html || "";
+    const out = document.createElement("div");
+    const walk = (src, dst) => src.childNodes.forEach(nd => {
+      if (nd.nodeType === 3) { dst.appendChild(document.createTextNode(nd.data)); return; }
+      if (nd.nodeType !== 1) return;
+      const tag = nd.tagName;
+      if (tag === "BR") { dst.appendChild(document.createElement("br")); return; }
+      if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEMPLATE") return;
+      let el = null;
+      if (tag === "B" || tag === "STRONG") el = document.createElement("b");
+      else if (tag === "I" || tag === "EM") el = document.createElement("i");
+      else if (tag === "U") el = document.createElement("u");
+      else if (tag === "DIV" || tag === "P") el = document.createElement("div");
+      else if (tag === "SPAN" || tag === "FONT") { const st = richStyle(nd); if (st) { el = document.createElement("span"); el.setAttribute("style", st); } }
+      if (el) { walk(nd, el); dst.appendChild(el); } else walk(nd, dst);
+    });
+    walk(tpl.content, out);
+    const h = out.innerHTML;
+    return h === "<br>" || h === "<div><br></div>" ? "" : h;
+  }
+  // tidy what the browser just added, touching attributes only so the selection stays put
+  function normRichDom(el) {
+    el.querySelectorAll("span[style], font").forEach(nd => {
+      const st = richStyle(nd);
+      if (st) nd.setAttribute("style", st); else nd.removeAttribute("style");
+      nd.removeAttribute("color"); nd.removeAttribute("size"); nd.removeAttribute("face");
+    });
+  }
+  const makeRich = el => { el.contentEditable = "true"; el.spellcheck = true; el.classList.add("nb-rich"); return el; };
+  const fillRich = (el, html, text) => { if (html != null && html !== "") el.innerHTML = cleanRich(html); else el.textContent = text || ""; };
   const makeEditable = el => { try { el.contentEditable = "plaintext-only"; } catch (e) {} if (el.contentEditable !== "plaintext-only") el.contentEditable = "true"; el.spellcheck = true; return el; };
   const normUrl = u => { u = (u || "").trim(); if (!u) return ""; if (!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = "https://" + u; return u; };
   const safeHref = u => (/^(https?:|mailto:|tel:)/i.test(u) ? u : "#");
+
+  function buildList(w, b) {
+    const isAct = b.type === "actions";
+    if (isAct) {
+      const h = makeEditable(document.createElement("div"));
+      h.className = "nb-edit nb-act-title"; h.dataset.f = "title"; h.textContent = b.title || "ACTION ITEMS";
+      w.appendChild(h);
+    }
+    const ul = document.createElement("ul");
+    ul.className = "nb-list";
+    (b.items || []).forEach(it => {
+      const li = document.createElement("li");
+      li.dataset.iid = it.id;
+      if (isAct) {
+        li.classList.toggle("done", !!it.done);
+        const ck = document.createElement("button");
+        ck.className = "nb-check"; ck.setAttribute("role", "checkbox"); ck.setAttribute("aria-checked", String(!!it.done)); ck.setAttribute("aria-label", "Action done");
+        ck.innerHTML = icon.check;
+        li.appendChild(ck);
+      }
+      const t = isAct ? makeEditable(document.createElement("div")) : makeRich(document.createElement("div"));
+      t.classList.add("nb-edit", "nb-item"); t.dataset.f = "text"; t.dataset.ph = isAct ? "Action" : "List item";
+      t.setAttribute("autocapitalize", "sentences");
+      if (isAct) t.textContent = it.text || ""; else fillRich(t, it.html, it.text);
+      li.appendChild(t);
+      if (isAct) {
+        const o = makeEditable(document.createElement("div"));
+        o.className = "nb-edit nb-who"; o.dataset.f = "who"; o.dataset.ph = "Owner"; o.spellcheck = false;
+        o.setAttribute("autocapitalize", "words");
+        o.textContent = it.who || "";
+        li.appendChild(o);
+      }
+      ul.appendChild(li);
+    });
+    w.appendChild(ul);
+    if (isAct) { const add = document.createElement("button"); add.className = "nb-more nb-additem"; add.innerHTML = icon.plus + "Action"; w.appendChild(add); }
+  }
+  const nbRemoveBtn = label => { const x = document.createElement("button"); x.className = "nb-x"; x.title = "Remove " + label; x.setAttribute("aria-label", x.title); x.textContent = "×"; return x; };
 
   function renderNoteBlocks(card, n) {
     const box = card.querySelector(".note-blocks");
@@ -1906,48 +2220,17 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       const w = document.createElement("div");
       w.className = "nb nbw-" + b.type;
       w.dataset.bid = b.id;
-      if (b.type !== "text") {
-        const x = document.createElement("button");
-        x.className = "nb-x"; x.title = "Remove " + NB_TYPES[b.type].toLowerCase(); x.setAttribute("aria-label", x.title); x.textContent = "×";
-        w.appendChild(x);
-      }
+      if (b.type !== "text") w.appendChild(nbRemoveBtn(NB_TYPES[b.type].toLowerCase()));
       if (b.type === "text") {
-        const t = makeEditable(document.createElement("div"));
-        t.className = "nb-edit nb-text"; t.dataset.f = "text";
+        const t = makeRich(document.createElement("div"));
+        t.classList.add("nb-edit", "nb-text"); t.dataset.f = "text";
         t.setAttribute("autocapitalize", "sentences");
         t.dataset.ph = bi === 0 ? "Type, paste, or tap the mic on your keyboard…" : "Keep typing…";
         if (bi === 0) t.classList.add("nb-first");
-        t.textContent = b.text || "";
+        fillRich(t, b.html, b.text);
         w.appendChild(t);
-      } else if (b.type === "bullets" || b.type === "actions") {
-        if (b.type === "actions") {
-          const h = makeEditable(document.createElement("div"));
-          h.className = "nb-edit nb-act-title"; h.dataset.f = "title"; h.textContent = b.title || "ACTION ITEMS";
-          w.appendChild(h);
-        }
-        const ul = document.createElement("ul");
-        ul.className = "nb-list";
-        (b.items || []).forEach(it => {
-          const li = document.createElement("li");
-          li.dataset.iid = it.id;
-          const t = makeEditable(document.createElement("div"));
-          t.className = "nb-edit nb-item"; t.dataset.f = "text"; t.dataset.ph = b.type === "actions" ? "Action" : "List item";
-          t.setAttribute("autocapitalize", "sentences");
-          t.textContent = it.text || "";
-          li.appendChild(t);
-          if (b.type === "actions") {
-            const o = makeEditable(document.createElement("div"));
-            o.className = "nb-edit nb-who"; o.dataset.f = "who"; o.dataset.ph = "Owner"; o.spellcheck = false;
-            o.setAttribute("autocapitalize", "words");
-            o.textContent = it.who || "";
-            li.appendChild(o);
-          }
-          ul.appendChild(li);
-        });
-        w.appendChild(ul);
-        if (b.type === "actions") {
-          const add = document.createElement("button"); add.className = "nb-more nb-additem"; add.innerHTML = icon.plus + "Action"; w.appendChild(add);
-        }
+      } else if (b.type === "bullets") {
+        buildList(w, b);
       } else if (b.type === "table") {
         const tb = document.createElement("div");
         tb.className = "nb-table";
@@ -1955,7 +2238,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
           ["a", "b"].forEach(f => {
             const c = makeEditable(document.createElement("div"));
             c.className = "nb-edit nb-cell" + (ri === 0 ? " nb-head" : ""); c.dataset.f = f; c.dataset.rid = r.id;
-            c.dataset.ph = ri === 0 ? (f === "a" ? "Heading" : "Heading") : "";
+            c.dataset.ph = ri === 0 ? "Heading" : "";
             c.textContent = r[f] || "";
             tb.appendChild(c);
           });
@@ -1984,13 +2267,163 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     });
   }
 
+  /* ----- note action items <-> Task card (linked both ways: text, owner, done) ----- */
+  const ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="11" height="11" rx="2.5"/><path d="M6.5 9l2 2 3-3.5"/><path d="M13 19.5h7.5M17.5 16.5l3 3-3 3"/></svg>';
+  const linkedTasks = (nid, aid) => {
+    const out = [];
+    lists.forEach(l => { if (isPri(l.id)) return; l.items.forEach(it => { if (it.link && it.link.n === nid && it.link.a === aid) out.push({ l, it }); }); });
+    return out;
+  };
+  const actionsTaskCard = n => (n.actions && n.actions.taskList && lists.get(n.actions.taskList)) || null;
+  const unsentActions = n => (n.actions ? n.actions.items.filter(a => (a.text || "").trim() && !linkedTasks(n.id, a.id).length) : []);
+  function paintSendBtn(card, n) {
+    const btn = card && card.querySelector(".act-send"); if (!btn || !n.actions) return;
+    const l = actionsTaskCard(n), k = unsentActions(n).length;
+    let label, mode;
+    if (!l) { label = "Make task card"; mode = "make"; }
+    else if (k) { label = `Add ${k} to task card`; mode = "add"; }
+    else { label = "Open task card"; mode = "open"; }
+    btn.dataset.mode = mode;
+    btn.disabled = mode === "make" && !k;
+    btn.title = l ? "Linked to " + l.title : "Turn these action items into a Task card that stays linked to this note";
+    btn.querySelector("span").textContent = label;
+  }
+  function sendActionsToTasks(nid) {
+    const n = ideas.get(nid); if (!n || !n.actions) return;
+    const a = n.actions;
+    let l = actionsTaskCard(n);
+    const nc = ideaEl(nid);
+    if (l && !unsentActions(n).length) { const c = cardEl(l.id); if (c) showCopy(c); return; }
+    const todo = unsentActions(n); if (!todo.length) return;
+    const prevTaskList = a.taskList, created = !l;
+    if (!l) {
+      const id = uid();
+      const spot = spotNear(n, CARD_W, nc ? nc.offsetHeight : 200);
+      l = { id, title: ((n.title || "NOTE").trim().toUpperCase() + " – ACTIONS").slice(0, 80), color: n.color, x: spot.x, y: spot.y, z: globalTopZ(), collapsed: false, created: Date.now(), items: [] };
+      lists.set(id, l);
+      placeAfterInPhoneOrder(n, l);
+    }
+    const added = todo.map(t => ({ id: uid(), text: capText((t.text || "").trim()), done: !!t.done, indent: 0, bic: t.who || "", status: t.done ? "Done" : "Not Started", prev: null, link: { n: nid, a: t.id } }));
+    l.items = sortDone([...l.items, ...added]);
+    a.taskList = l.id;
+    n.updated = Date.now();
+    renderEmpty();
+    if (cardEl(l.id)) renderItems(cardEl(l.id), l); else renderCard(l.id);
+    layout();
+    scheduleSave(l.id, 50); iScheduleSave(nid, 200);
+    if (nc) paintSendBtn(nc, n);
+    showCopy(cardEl(l.id));
+    const lid = l.id, ids = added.map(x => x.id);
+    showUndo(created ? "Task card created" : `Added ${added.length} to ${l.title}`, () => {
+      const cur = ideas.get(nid); if (cur && cur.actions) cur.actions.taskList = prevTaskList;
+      if (created) { lists.delete(lid); const c = cardEl(lid); if (c) c.remove(); }
+      else { const tl = lists.get(lid); if (tl) { tl.items = tl.items.filter(i => !ids.includes(i.id)); const c = cardEl(lid); if (c) renderItems(c, tl); } }
+      renderEmpty(); layout(); scheduleSave(lid, 0); if (cur) iScheduleSave(nid, 200);
+      const c2 = ideaEl(nid); if (c2 && cur) paintSendBtn(c2, cur);
+    });
+  }
+  // a task card changed: copy linked tasks back into their notes
+  function syncListToNotes(lid) {
+    const l = lists.get(lid); if (!l || isPri(lid)) return;
+    const touched = new Set();
+    l.items.forEach(it => {
+      if (!it.link) return;
+      const n = ideas.get(it.link.n), ai = n && n.actions && n.actions.items.find(x => x.id === it.link.a);
+      if (!ai) return;
+      if ((ai.text || "") !== (it.text || "")) { ai.text = it.text || ""; touched.add(n.id); }
+      if ((ai.who || "") !== (it.bic || "")) { ai.who = it.bic || ""; touched.add(n.id); }
+      if (!!ai.done !== !!it.done) { ai.done = !!it.done; touched.add(n.id); }
+    });
+    touched.forEach(nid => {
+      const n = ideas.get(nid); n.text = noteText(n); n.updated = Date.now();
+      const c = ideaEl(nid);
+      if (c && !c.querySelector(".note-actions").contains(document.activeElement)) renderNoteActions(c, n);
+      iScheduleSave(nid, 700);
+    });
+    if (touched.size) layout();
+  }
+  // a note changed: copy its action items into their linked tasks
+  function syncNoteToLists(nid) {
+    const n = ideas.get(nid); if (!n || !n.actions) return;
+    const byId = new Map(n.actions.items.map(a => [a.id, a]));
+    lists.forEach(l => {
+      if (isPri(l.id)) return;
+      let ch = false, doneCh = false;
+      l.items.forEach(it => {
+        if (!it.link || it.link.n !== nid) return;
+        const a = byId.get(it.link.a); if (!a) return;
+        if ((it.text || "") !== (a.text || "")) { it.text = a.text || ""; ch = true; syncPriText(l.id, it); }
+        if ((it.bic || "") !== (a.who || "")) { it.bic = a.who || ""; ch = true; syncPriText(l.id, it); }
+        if (!!it.done !== !!a.done) {
+          it.done = !!a.done; ch = doneCh = true;
+          if (it.done) { if (it.status && it.status !== "Done") it.prev = it.status; it.status = "Done"; }
+          else it.status = it.prev && it.prev !== "Done" ? it.prev : "Not Started";
+          priEntriesFor(l.id, it.id).forEach(en => { en.done = it.done; });
+        }
+      });
+      if (!ch) return;
+      const c = cardEl(l.id);
+      if (c) {
+        if (!c.contains(document.activeElement)) { if (doneCh) l.items = sortDone(l.items); renderItems(c, l); }
+        else l.items.forEach(it => {
+          if (!it.link || it.link.n !== nid) return;
+          const row = c.querySelector(`.item[data-iid="${it.id}"]`); if (!row) return;
+          const t = row.querySelector(".text"), b = row.querySelector(".bic-text");
+          if (t !== document.activeElement) t.textContent = it.text;
+          if (b !== document.activeElement) b.textContent = it.bic || "";
+          row.classList.toggle("done", !!it.done);
+          row.querySelector(".check").setAttribute("aria-checked", String(!!it.done));
+          paintTaskStatus(row.querySelector(".status-pill"), it);
+        });
+        updateTrash(c, l);
+      }
+      if (doneCh) { renderPri(); scheduleSave(PRI_ID, 600); }
+      scheduleSave(l.id, 700);
+      layout();
+    });
+  }
+
+  // Action items live in their own section under the note, above the tags
+  function renderNoteActions(card, n) {
+    const box = card.querySelector(".note-actions");
+    box.textContent = "";
+    box.hidden = !n.actions;
+    if (!n.actions) return;
+    const w = document.createElement("div");
+    w.className = "nb nbw-actions"; w.dataset.bid = n.actions.id;
+    w.appendChild(nbRemoveBtn("action items"));
+    buildList(w, n.actions);
+    const add = w.querySelector(".nb-additem");
+    const foot = document.createElement("div"); foot.className = "nb-act-foot";
+    add.replaceWith(foot); foot.appendChild(add);
+    const send = document.createElement("button"); send.className = "act-send"; send.innerHTML = ICON_SEND + "<span></span>";
+    foot.appendChild(send);
+    box.appendChild(w);
+    paintSendBtn(card, n);
+  }
+
+  // one selection listener for every note: keeps B / I / U lit while the caret is in bold, italic or underlined text
+  document.addEventListener("selectionchange", () => {
+    const a = document.activeElement;
+    const c = a && a.closest && a.closest(".idea-card");
+    if (c && c._updateFmt) c._updateFmt();
+  });
+
   function wireNoteBlocks(card) {
     const id = card.dataset.id;
     const N = () => ideas.get(id);
     const box = card.querySelector(".note-blocks");
+    const actBox = card.querySelector(".note-actions");
+    const root = card.querySelector(".card-body");
     const tools = card.querySelector(".note-tools");
-    let lastBid = null, suggT;
-    const blockOf = el => { const w = el.closest(".nb"); return w ? N().blocks.find(b => b.id === w.dataset.bid) : null; };
+    let lastBid = null, lastRich = null, suggT;
+    const inNote = el => !!el && (box.contains(el) || actBox.contains(el));
+    const blockOf = el => {
+      const w = el.closest(".nb"); if (!w || !inNote(w)) return null;
+      const n = N();
+      if (n.actions && n.actions.id === w.dataset.bid) return n.actions;
+      return n.blocks.find(b => b.id === w.dataset.bid) || null;
+    };
     const changed = (delay = 700) => {
       const n = N();
       n.text = noteText(n); n.updated = Date.now();
@@ -1998,45 +2431,127 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       clearTimeout(suggT);
       suggT = setTimeout(() => { renderSuggest(card, n); ideaLayout(); }, 400);
     };
-    const rerender = () => { renderNoteBlocks(card, N()); ideaLayout(); };
-    const focusEl = (sel, atStart) => { const el = box.querySelector(sel); if (el) setCaret(el, atStart ? 0 : el.textContent.length); return el; };
+    const rerender = () => { const n = N(); renderNoteBlocks(card, n); renderNoteActions(card, n); ideaLayout(); };
+    const focusEl = (sel, atStart) => { const el = root.querySelector(sel); if (el) setCaret(el, atStart ? 0 : el.textContent.length); return el; };
     const focusBlockEnd = b => {
       if (!b) return;
       const w = `.nb[data-bid="${b.id}"]`;
       if (b.type === "text") focusEl(`${w} .nb-text`);
-      else if (b.type === "table") { const cells = box.querySelectorAll(`${w} .nb-cell`); const c = cells[cells.length - 1]; if (c) setCaret(c, c.textContent.length); }
-      else if (b.type === "link") { const u = box.querySelector(`${w} .nb-link-url`); if (u) u.focus(); }
-      else { const items = box.querySelectorAll(`${w} .nb-item`); const c = items[items.length - 1]; if (c) setCaret(c, c.textContent.length); }
+      else if (b.type === "table") { const cells = root.querySelectorAll(`${w} .nb-cell`); const c = cells[cells.length - 1]; if (c) setCaret(c, c.textContent.length); }
+      else if (b.type === "link") { const u = root.querySelector(`${w} .nb-link-url`); if (u) u.focus(); }
+      else { const items = root.querySelectorAll(`${w} .nb-item`); const c = items[items.length - 1]; if (c) setCaret(c, c.textContent.length); }
     };
+    const lastTextEnd = () => { const t = [...N().blocks].reverse().find(b => b.type === "text"); focusBlockEnd(t); };
     const ensureTextAfter = idx => {
       const n = N();
       if (!n.blocks[idx + 1] || n.blocks[idx + 1].type !== "text") n.blocks.splice(idx + 1, 0, { id: uid(), type: "text", text: "" });
       return n.blocks[idx + 1];
     };
+    const isRich = el => !!el && !!el.classList && el.classList.contains("nb-rich") && box.contains(el);
 
-    box.addEventListener("focusin", e => { const w = e.target.closest(".nb"); if (w) lastBid = w.dataset.bid; });
-    box.addEventListener("input", e => {
-      const el = e.target;
-      if (el.closest(".nb-linkform")) return;
-      if (!el.classList.contains("nb-edit")) return;
+    // copy one field from the page into the note
+    function syncField(el, ev) {
       const b = blockOf(el); if (!b) return;
-      const f = el.dataset.f, val = el.innerText.replace(/\n$/, "");
-      if (["text", "title"].includes(f) && !e.isComposing && !el.classList.contains("nb-cell")) capitalizeFirst(el);
-      const v = f === "who" ? val : el.innerText.replace(/\n$/, "");
-      if (b.type === "text") b.text = v;
+      const f = el.dataset.f, rich = el.classList.contains("nb-rich");
+      if (rich) {
+        if (!el.textContent && ev && /^delete/.test(ev.inputType || "") && el.innerHTML !== "") el.innerHTML = "";
+        normRichDom(el);
+      }
+      const v = el.innerText.replace(/\n$/, "");
+      if (b.type === "text") { b.text = v; if (rich) b.html = cleanRich(el.innerHTML); }
       else if (b.type === "actions" && f === "title") b.title = v;
       else if (b.type === "table") { const r = b.rows.find(x => x.id === el.dataset.rid); if (r) r[f] = v.replace(/\n/g, " "); }
-      else { const li = el.closest("li"); const it = li && b.items.find(x => x.id === li.dataset.iid); if (it) it[f] = v.replace(/\n/g, " "); }
+      else {
+        const li = el.closest("li"); const it = li && b.items.find(x => x.id === li.dataset.iid);
+        if (it) { it[f] = v.replace(/\n/g, " "); if (rich && f === "text") it.html = cleanRich(el.innerHTML); }
+      }
       changed();
+      if (b.type === "actions") paintSendBtn(card, N());
+    }
+
+    // ----- text formatting -----
+    function richTarget() {
+      const a = document.activeElement;
+      if (isRich(a)) return a;
+      let el = isRich(lastRich) ? lastRich : null;
+      if (!el) { const n = N(); const t = [...n.blocks].reverse().find(b => b.type === "text"); el = t ? box.querySelector(`.nb[data-bid="${t.id}"] .nb-text`) : null; }
+      if (el) setCaret(el, el.textContent.length);
+      return el;
+    }
+    function applyFormat(cmd, val) {
+      if (N().collapsed) return;
+      const el = richTarget(); if (!el) return;
+      const css = cmd === "foreColor" || cmd === "fontSize";
+      try { document.execCommand("styleWithCSS", false, css); } catch (e) {}
+      try { document.execCommand(cmd, false, val == null ? null : String(val)); } catch (e) {}
+      try { document.execCommand("styleWithCSS", false, false); } catch (e) {}
+      syncField(el);
+      updateFmt();
+    }
+    function updateFmt() {
+      const on = isRich(document.activeElement);
+      tools.classList.toggle("fmt-live", on);
+      ["bold", "italic", "underline"].forEach(c => {
+        let st = false;
+        if (on) { try { st = document.queryCommandState(c); } catch (e) {} }
+        const b = tools.querySelector(`[data-fmt="${c}"]`); if (b) b.setAttribute("aria-pressed", st ? "true" : "false");
+      });
+    }
+    card._updateFmt = updateFmt;
+    const closeStylePop = () => {
+      const p = tools.querySelector(".fmt-pop"); if (!p) return false;
+      p.remove(); tools.querySelector('[data-fmt="style"]').setAttribute("aria-expanded", "false"); return true;
+    };
+    function toggleStylePop(btn) {
+      if (closeStylePop()) return;
+      closeTagPops();
+      const pop = document.createElement("div");
+      pop.className = "pop fmt-pop";
+      pop.innerHTML = `<div class="pop-label">Size</div><div class="fmt-sizes">` +
+        RICH_SIZES.map(([l, v, em]) => `<button type="button" data-size="${v}" style="font-size:calc(13px * ${em ? em.replace("em", "") : 1})">${l}</button>`).join("") +
+        `</div><div class="pop-label fmt-gap">Color</div><div class="fmt-colors">` +
+        RICH_COLORS.map(([l, c]) => `<button type="button" data-color="${c}" title="${l}" aria-label="${l}"${c ? ` style="--c:${c}"` : ` class="is-default"`}></button>`).join("") + `</div>`;
+      tools.appendChild(pop);
+      btn.setAttribute("aria-expanded", "true");
+    }
+
+    function addAction() {
+      const n = N();
+      const it = { id: uid(), text: "", who: "" };
+      if (!n.actions) n.actions = { id: uid(), type: "actions", title: "ACTION ITEMS", items: [it] };
+      else n.actions.items.push(it);
+      if (n.collapsed) { n.collapsed = false; card.classList.remove("collapsed"); }
+      rerender(); changed(300);
+      focusEl(`.note-actions li[data-iid="${it.id}"] .nb-item`, true);
+    }
+
+    root.addEventListener("focusin", e => {
+      const w = e.target.closest(".nb");
+      if (w && box.contains(w)) lastBid = w.dataset.bid;
+      if (isRich(e.target)) lastRich = e.target;
+      updateFmt();
     });
-    box.addEventListener("paste", e => {
-      const el = e.target.closest(".nb-edit"); if (!el || el.contentEditable === "plaintext-only") return;
+    root.addEventListener("focusout", () => setTimeout(updateFmt, 0));
+    root.addEventListener("input", e => {
+      const el = e.target;
+      if (!el.classList || !el.classList.contains("nb-edit") || !inNote(el)) return;
+      const f = el.dataset.f;
+      if ((f === "text" || f === "title") && !e.isComposing && !el.classList.contains("nb-cell") && (!e.inputType || /^insert/.test(e.inputType))) capitalizeFirst(el);
+      syncField(el, e);
+    });
+    root.addEventListener("paste", e => {
+      const el = e.target.closest && e.target.closest(".nb-edit"); if (!el || !inNote(el) || el.contentEditable === "plaintext-only") return;
       e.preventDefault();
       document.execCommand("insertText", false, (e.clipboardData || window.clipboardData).getData("text/plain"));
     });
-    box.addEventListener("keydown", e => {
-      const el = e.target.closest(".nb-edit"); if (!el || e.isComposing) return;
+    root.addEventListener("keydown", e => {
+      const el = e.target.closest && e.target.closest(".nb-edit"); if (!el || !inNote(el) || e.isComposing) return;
       const n = N(), b = blockOf(el); if (!b) return;
+      // Ctrl/Cmd + B, I, U
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && isRich(el)) {
+        const k = e.key.toLowerCase(), cmd = { b: "bold", i: "italic", u: "underline" }[k];
+        if (cmd) { e.preventDefault(); applyFormat(cmd); return; }
+      }
       const bi = n.blocks.indexOf(b), f = el.dataset.f;
       const empty = !el.textContent.trim();
       if (b.type === "text") {
@@ -2064,46 +2579,79 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       // bullets / action items
       const li = el.closest("li"); if (!li) return;
       const it = b.items.find(x => x.id === li.dataset.iid), ii = b.items.indexOf(it);
+      const isAct = b.type === "actions";
       if (e.key === "Enter") {
         e.preventDefault();
         if (f === "text" && empty && !(it.who || "").trim()) {
-          // empty line: leave the list and keep typing below it
+          if (isAct) {
+            // empty action line: finish the list
+            if (b.items.length > 1) { b.items.splice(ii, 1); rerender(); changed(); }
+            if (document.activeElement) document.activeElement.blur();
+            return;
+          }
+          // empty bullet: leave the list and keep typing below it
           b.items.splice(ii, 1);
           if (!b.items.length) { n.blocks.splice(bi, 1); const t = n.blocks[bi] && n.blocks[bi].type === "text" ? n.blocks[bi] : (n.blocks.splice(bi, 0, { id: uid(), type: "text", text: "" }), n.blocks[bi]); rerender(); changed(); focusBlockEnd(t); return; }
           const t = ensureTextAfter(bi); rerender(); changed(); focusEl(`.nb[data-bid="${t.id}"] .nb-text`, true); return;
         }
-        const nu = { id: uid(), text: "" }; if (b.type === "actions") nu.who = "";
+        const nu = { id: uid(), text: "" }; if (isAct) nu.who = "";
         b.items.splice(ii + 1, 0, nu); rerender(); changed();
         focusEl(`.nb[data-bid="${b.id}"] li[data-iid="${nu.id}"] .nb-item`, true);
       } else if (e.key === "Backspace" && f === "text" && caretOffset(el) === 0 && empty && !(it.who || "").trim()) {
         e.preventDefault();
         b.items.splice(ii, 1);
-        if (!b.items.length) { n.blocks.splice(bi, 1); if (!n.blocks.length) n.blocks.push({ id: uid(), type: "text", text: "" }); rerender(); changed(); focusBlockEnd(n.blocks[Math.max(0, bi - 1)]); return; }
+        if (!b.items.length) {
+          if (isAct) n.actions = null;
+          else { n.blocks.splice(bi, 1); if (!n.blocks.length) n.blocks.push({ id: uid(), type: "text", text: "" }); }
+          rerender(); changed();
+          if (isAct) lastTextEnd(); else focusBlockEnd(n.blocks[Math.max(0, bi - 1)]);
+          return;
+        }
         rerender(); changed();
         const prev = b.items[Math.max(0, ii - 1)]; focusEl(`.nb[data-bid="${b.id}"] li[data-iid="${prev.id}"] .nb-item`);
       }
     });
-    box.addEventListener("click", e => {
+    root.addEventListener("click", e => {
       const n = N();
       const x = e.target.closest(".nb-x");
-      if (x) {
-        const b = blockOf(x), bi = n.blocks.indexOf(b), snap = cloneBlocks(n.blocks);
+      if (x && inNote(x)) {
+        const b = blockOf(x); if (!b) return;
+        if (b === n.actions) {
+          const snap = cloneActions(n.actions);
+          n.actions = null; rerender(); changed(300);
+          showUndo("Action items removed", () => { const cur = ideas.get(id); if (!cur) return; cur.actions = snap; cur.text = noteText(cur); renderNoteActions(card, cur); ideaLayout(); iScheduleSave(id, 200); });
+          return;
+        }
+        const bi = n.blocks.indexOf(b), snap = cloneBlocks(n.blocks);
         n.blocks.splice(bi, 1);
         // merge neighbouring text blocks so the note reads as one
         if (n.blocks[bi - 1] && n.blocks[bi] && n.blocks[bi - 1].type === "text" && n.blocks[bi].type === "text") {
           const a = n.blocks[bi - 1], c = n.blocks[bi];
-          a.text = [a.text, c.text].filter(Boolean).join("\n"); n.blocks.splice(bi, 1);
+          const ah = a.html != null ? a.html : escapeHtml(a.text || ""), ch = c.html != null ? c.html : escapeHtml(c.text || "");
+          a.text = [a.text, c.text].filter(Boolean).join("\n");
+          a.html = [ah, ch].filter(Boolean).join("<br>");
+          n.blocks.splice(bi, 1);
         }
         if (!n.blocks.length) n.blocks.push({ id: uid(), type: "text", text: "" });
         rerender(); changed(300);
         showUndo(NB_TYPES[b.type] + " removed", () => { const cur = ideas.get(id); if (!cur) return; cur.blocks = snap; cur.text = noteText(cur); renderNoteBlocks(card, cur); ideaLayout(); iScheduleSave(id, 200); });
         return;
       }
+      if (!inNote(e.target)) return;
+      const ck = e.target.closest(".nb-check");
+      if (ck) {
+        const b = blockOf(ck), li = ck.closest("li"), it = b && b.items.find(x => x.id === li.dataset.iid); if (!it) return;
+        it.done = !it.done;
+        li.classList.toggle("done", it.done); ck.setAttribute("aria-checked", String(it.done));
+        changed(300);
+        return;
+      }
+      if (e.target.closest(".act-send")) { sendActionsToTasks(id); return; }
       if (e.target.closest(".nb-addrow")) { const b = blockOf(e.target); const r = { id: uid(), a: "", b: "" }; b.rows.push(r); rerender(); changed(); focusEl(`.nb[data-bid="${b.id}"] .nb-cell[data-rid="${r.id}"][data-f="a"]`, true); return; }
       if (e.target.closest(".nb-additem")) { const b = blockOf(e.target); const it = { id: uid(), text: "", who: "" }; b.items.push(it); rerender(); changed(); focusEl(`.nb[data-bid="${b.id}"] li[data-iid="${it.id}"] .nb-item`, true); return; }
-      if (e.target.closest(".nb-link-edit")) { const b = blockOf(e.target); b.editing = true; rerender(); const u = box.querySelector(`.nb[data-bid="${b.id}"] .nb-link-url`); if (u) { u.focus(); u.select(); } return; }
+      if (e.target.closest(".nb-link-edit")) { const b = blockOf(e.target); b.editing = true; rerender(); const u = root.querySelector(`.nb[data-bid="${b.id}"] .nb-link-url`); if (u) { u.focus(); u.select(); } return; }
     });
-    box.addEventListener("submit", e => {
+    root.addEventListener("submit", e => {
       const form = e.target.closest(".nb-linkform"); if (!form) return;
       e.preventDefault();
       const n = N(), b = blockOf(form), bi = n.blocks.indexOf(b);
@@ -2114,22 +2662,28 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       rerender(); changed(300);
       focusEl(`.nb[data-bid="${t.id}"] .nb-text`, true);
     });
-    box.addEventListener("keydown", e => { if (e.key === "Escape" && e.target.closest(".nb-linkform")) { const b = blockOf(e.target); if (b && b.url) { delete b.editing; rerender(); } } });
+    root.addEventListener("keydown", e => { if (e.key === "Escape" && e.target.closest && e.target.closest(".nb-linkform")) { const b = blockOf(e.target); if (b && b.url) { delete b.editing; rerender(); } } });
 
-    // insert bar
+    // tool bar: formatting + inserts
     tools.addEventListener("pointerdown", e => { if (e.target.closest("button")) e.preventDefault(); });
     tools.addEventListener("click", e => {
+      const fb = e.target.closest("[data-fmt]");
+      if (fb) { if (fb.dataset.fmt === "style") toggleStylePop(fb); else applyFormat(fb.dataset.fmt); return; }
+      const sz = e.target.closest("[data-size]");
+      if (sz) { applyFormat("fontSize", sz.dataset.size); closeStylePop(); return; }
+      const co = e.target.closest("[data-color]");
+      if (co) { applyFormat("foreColor", co.dataset.color || DEFAULT_MARK); closeStylePop(); return; }
       const btn = e.target.closest("button[data-insert]"); if (!btn) return;
       const n = N(), type = btn.dataset.insert;
+      if (type === "actions") { addAction(); return; }
       let at = n.blocks.findIndex(b => b.id === lastBid);
       if (at < 0) at = n.blocks.length - 1;
-      // drop a trailing empty text line so the new piece sits right after what you typed
       const cur = n.blocks[at];
       let nb;
       if (type === "bullets") nb = { id: uid(), type, items: [{ id: uid(), text: "" }] };
       if (type === "table") nb = { id: uid(), type, rows: [{ id: uid(), a: "", b: "" }, { id: uid(), a: "", b: "" }] };
-      if (type === "actions") nb = { id: uid(), type, title: "ACTION ITEMS", items: [{ id: uid(), text: "", who: "" }] };
       if (type === "link") nb = { id: uid(), type, label: "", url: "", editing: true };
+      // an empty line you were sitting on becomes the new piece
       if (cur && cur.type === "text" && !cur.text.trim() && n.blocks.length > 1 && at > 0) { n.blocks.splice(at, 1, nb); }
       else n.blocks.splice(at + 1, 0, nb);
       const ni = n.blocks.indexOf(nb);
@@ -2137,15 +2691,16 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       if (n.collapsed) { n.collapsed = false; card.classList.remove("collapsed"); }
       rerender(); changed(300);
       const w = `.nb[data-bid="${nb.id}"]`;
-      if (type === "bullets" || type === "actions") focusEl(`${w} .nb-item`, true);
+      if (type === "bullets") focusEl(`${w} .nb-item`, true);
       else if (type === "table") focusEl(`${w} .nb-cell`, true);
-      else { const u = box.querySelector(`${w} .nb-link-url`); if (u) u.focus(); }
+      else { const u = root.querySelector(`${w} .nb-link-url`); if (u) u.focus(); }
     });
   }
 
   function renderIdea(id) {
     const n = normNote(ideas.get(id));
     let card = ideaEl(id);
+    if (n.box) { if (card) card.remove(); return; }
     if (!card) {
       card = document.createElement("article");
       card.className = "card idea-card";
@@ -2159,11 +2714,18 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
         <div class="card-body">
           <div class="note-blocks"></div>
           <div class="note-tools" aria-label="Add to note">
-            <button data-insert="bullets" title="Add a bullet list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="5" cy="17" r="1.3" fill="currentColor"/><path d="M10 7h10M10 12h10M10 17h10"/></svg><span>Bullets</span></button>
-            <button data-insert="table" title="Add a 2-column table"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M3.5 10h17M12 5v14"/></svg><span>Table</span></button>
-            <button data-insert="actions" title="Add action items"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l2 2 3.5-3.5M4 15l2 2 3.5-3.5M13 7.5h7M13 15.5h7"/></svg><span>Action items</span></button>
-            <button data-insert="link" title="Add a link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13.5a4.5 4.5 0 0 0 6.4.4l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10.5a4.5 4.5 0 0 0-6.4-.4l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></svg><span>Link</span></button>
+            <span class="nt-group" role="group" aria-label="Text style">
+            <button class="fmt" data-fmt="bold" title="Bold (Ctrl+B)" aria-pressed="false"><b>B</b></button>
+            <button class="fmt" data-fmt="italic" title="Italic (Ctrl+I)" aria-pressed="false"><i>I</i></button>
+            <button class="fmt" data-fmt="underline" title="Underline (Ctrl+U)" aria-pressed="false"><u>U</u></button>
+            <button class="fmt fmt-style" data-fmt="style" title="Text color and size" aria-haspopup="true" aria-expanded="false">Aa<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10l5 5 5-5"/></svg></button>
+            </span><span class="nt-sep" aria-hidden="true"></span>
+            <button class="ico" data-insert="bullets" title="Add a bullet list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="5" cy="17" r="1.3" fill="currentColor"/><path d="M10 7h10M10 12h10M10 17h10"/></svg><span>Bullets</span></button>
+            <button class="ico" data-insert="table" title="Add a 2-column table"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M3.5 10h17M12 5v14"/></svg><span>Table</span></button>
+            <button class="ico" data-insert="link" title="Add a link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13.5a4.5 4.5 0 0 0 6.4.4l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10.5a4.5 4.5 0 0 0-6.4-.4l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></svg><span>Link</span></button>
+            <button class="nt-act" data-insert="actions" title="Add action items below the note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l2 2 3.5-3.5M4 15l2 2 3.5-3.5M13 7.5h7M13 15.5h7"/></svg><span>Action items</span></button>
           </div>
+          <div class="note-actions" hidden></div>
           <div class="note-tags"></div>
           <div class="suggest" hidden></div>
           <div class="idea-meta"></div>
@@ -2178,6 +2740,8 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     card.classList.toggle("collapsed", !!n.collapsed);
     const nbBox = card.querySelector(".note-blocks");
     if (!nbBox.contains(document.activeElement)) renderNoteBlocks(card, n);
+    const actBox = card.querySelector(".note-actions");
+    if (!actBox.contains(document.activeElement)) renderNoteActions(card, n);
     card.querySelector(".idea-meta").textContent = fmtWhen(n.created);
     renderNoteTags(card, n);
     renderSuggest(card, n);
@@ -2236,7 +2800,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     const nid = uid();
     const spot = spotNear(n, CARD_W, el ? el.offsetHeight : 200);
     const now = Date.now();
-    const copy = { id: nid, title: n.title, text: n.text || "", blocks: cloneBlocks(n.blocks, true), tags: (n.tags || []).slice(), color: n.color, x: spot.x, y: spot.y, z: globalTopZ(), collapsed: !!n.collapsed, created: now, updated: now };
+    const copy = { id: nid, title: n.title, text: n.text || "", blocks: cloneBlocks(n.blocks, true), actions: cloneActions(n.actions, true), tags: (n.tags || []).slice(), color: n.color, x: spot.x, y: spot.y, z: globalTopZ(), collapsed: !!n.collapsed, created: now, updated: now };
     ideas.set(nid, copy);
     placeAfterInPhoneOrder(n, copy);
     renderIdeaEmpty(); renderIdea(nid); ideaLayout();
@@ -2296,8 +2860,11 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       <div class="swatches">${COLORS.map(c => `<button class="sw" style="background:${c}" data-c="${c}" aria-label="Color ${c}" aria-pressed="${c.toLowerCase() === (n.color || "").toLowerCase()}"></button>`).join("")}</div>
       <label class="custom"><input type="color" id="ncolor-${id}" value="${/^#[0-9a-f]{6}$/i.test(n.color) ? n.color : "#ffffff"}">Custom color</label>
       <hr>
-      <button class="pop-action dup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6A2.5 2.5 0 0 0 13 3.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg>Duplicate card</button>
-      <div class="del-row"><button class="del">Delete note</button></div>`;
+      <div class="pop-menu">
+        <button class="pop-action dup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6A2.5 2.5 0 0 0 13 3.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg>Duplicate card</button>
+        <button class="pop-action tobox">${ICON_BOX}Move to box</button>
+        <div class="del-row"><button class="pop-action danger del">${icon.trash}Delete note</button></div>
+      </div>`;
     card.appendChild(pop);
     const apply = c => {
       n.color = c;
@@ -2319,6 +2886,9 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       }
       if (e.target.closest(".no")) closeTagPops();
       if (e.target.closest(".dup")) { closeTagPops(); duplicateNote(id); }
+      if (e.target.closest(".tobox")) { showBoxChooser(pop, id); return; }
+      const pick = e.target.closest(".bx-pick");
+      if (pick) fileNote(id, pick.dataset.bid);
     });
     pop.querySelector('input[type="color"]').addEventListener("input", e => apply(e.target.value));
   }
@@ -2368,7 +2938,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       if (e.target.closest(".tag-done")) closeTagPops();
     });
   }
-  document.addEventListener("pointerdown", e => { if (!e.target.closest(".idea-card .pop") && !e.target.closest(".add-tag-chip, .idea-card .color-btn")) closeTagPops(); });
+  document.addEventListener("pointerdown", e => { if (!e.target.closest(".idea-card .pop") && !e.target.closest(".add-tag-chip, .idea-card .color-btn, .fmt-style")) closeTagPops(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeTagPops(); });
 
   function wireIdea(card) {
@@ -2424,7 +2994,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     card.querySelector(".color-btn").addEventListener("click", e => { e.stopPropagation(); if (card.querySelector(".note-pop")) closeTagPops(); else openNoteOptions(card); });
 
     wireNoteBlocks(card);
-    card.querySelector(".note-blocks").addEventListener("focusout", () => { renderSuggest(card, N()); ideaLayout(); });
+    card.querySelectorAll(".note-blocks, .note-actions").forEach(el => el.addEventListener("focusout", () => { renderSuggest(card, N()); ideaLayout(); }));
 
     const tagsBox = card.querySelector(".note-tags");
     tagsBox.addEventListener("click", e => {
@@ -2445,6 +3015,272 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     renderIdeaEmpty();
     ideaLayout();
   }
+
+  /* ================= BOXES: file notes away, browse and search them, bring them back ================= */
+  const BLS_KEY = "task-canvas-boxes-v1", ORPHAN = "__orphan";
+  let boxes = [];
+  const ICON_BOX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/></svg>';
+  const ICON_CHEV_R = '<svg class="bp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+  const ICON_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V7M7 11.5L12 6.5l5 5"/><path d="M5 20h14"/></svg>';
+  const safeColor = c => (/^#[0-9a-f]{3,8}$/i.test(c || "") ? c : "#8e8e93");
+  const boxById = id => boxes.find(b => b.id === id);
+  const isOrphan = n => !!n.box && !boxById(n.box);
+  const orphanBox = () => ({ id: ORPHAN, name: "Unsorted", color: "#8e8e93" });
+  const filedIn = bid => [...ideas.values()].filter(n => n.box && (bid === ORPHAN ? isOrphan(n) : n.box === bid)).sort((a, b) => (b.filedAt || 0) - (a.filedAt || 0));
+  const allFiled = () => [...ideas.values()].filter(n => n.box).sort((a, b) => (b.filedAt || 0) - (a.filedAt || 0));
+  const boxOf = n => (n.box ? boxById(n.box) || orphanBox() : null);
+  const noteSearchText = n => [n.title || "", (n.tags || []).join(" "), noteText(normNote(n))].join(" ");
+  const shortWhen = ts => { try { return ts ? new Date(ts).toLocaleDateString([], { month: "short", day: "numeric" }) : ""; } catch (e) { return ""; } };
+
+  function boxesSaveLocal() { try { localStorage.setItem(BLS_KEY, JSON.stringify(boxes)); } catch (e) {} }
+  function boxesLoadLocal() { try { const a = JSON.parse(localStorage.getItem(BLS_KEY) || "[]"); if (Array.isArray(a)) boxes = a.filter(b => b && b.id); } catch (e) {} }
+  let boxSaveT;
+  function saveBoxes() {
+    boxesSaveLocal();
+    clearTimeout(boxSaveT);
+    boxSaveT = setTimeout(() => { if (db) db.doc("settings/boxes").set({ boxes: boxes.map(b => ({ id: b.id, name: b.name, color: b.color, created: b.created || null })) }).catch(() => {}); }, 300);
+  }
+  function createBox(name) {
+    const used = boxes.map(b => b.color);
+    const b = { id: uid(), name: (name || "").trim().slice(0, 40) || "New box", color: NEW_CARD_COLORS.find(c => !used.includes(c)) || NEW_CARD_COLORS[boxes.length % NEW_CARD_COLORS.length], created: Date.now() };
+    boxes.push(b); saveBoxes();
+    return b;
+  }
+
+  // header button with the number of filed notes
+  function paintBoxBtn(pulse) {
+    const btn = document.getElementById("boxesBtn"); if (!btn) return;
+    const k = allFiled().length, badge = btn.querySelector(".box-count");
+    badge.hidden = !k; badge.textContent = k > 99 ? "99+" : String(k);
+    btn.setAttribute("aria-label", k ? `Boxes, ${k} filed note${k > 1 ? "s" : ""}` : "Boxes");
+    if (pulse) { btn.classList.remove("box-pulse"); void btn.offsetWidth; btn.classList.add("box-pulse"); }
+  }
+
+  // put a note away in a box (it leaves the canvas)
+  function fileNote(id, bid) {
+    const n = ideas.get(id), b = boxById(bid); if (!n || !b) return;
+    const card = ideaEl(id), prev = { x: n.x, y: n.y, m: n.m };
+    closeTagPops();
+    if (card && card.contains(document.activeElement)) document.activeElement.blur();
+    const done = () => { n.box = bid; n.filedAt = Date.now(); n.updated = Date.now(); renderIdea(id); renderIdeaEmpty(); ideaLayout(); iScheduleSave(id, 200); paintBoxBtn(true); renderBoxPanel(); };
+    if (card) { card.classList.add("filing"); setTimeout(done, 230); } else done();
+    showUndo(`Filed in ${b.name}`, () => {
+      const cur = ideas.get(id); if (!cur) return;
+      cur.box = null; cur.filedAt = null; Object.assign(cur, prev);
+      renderIdea(id); renderIdeaEmpty(); ideaLayout(); iScheduleSave(id, 200); paintBoxBtn(); renderBoxPanel();
+    });
+  }
+  // take a note out of its box and put it back on the canvas
+  function unfile(n) {
+    const spot = findSpot(CARD_W);
+    const ms = allCards().map(c => c.o.m).filter(v => typeof v === "number");
+    n.box = null; n.filedAt = null; n.x = spot.x; n.y = spot.y; n.z = globalTopZ(); n.updated = Date.now();
+    n.m = (ms.length ? Math.min(...ms) : 0) - 1;
+    renderIdea(n.id);
+  }
+  function restoreNote(nid) {
+    const n = ideas.get(nid); if (!n || !n.box) return;
+    const prev = { box: n.box, filedAt: n.filedAt, x: n.x, y: n.y, m: n.m };
+    unfile(n);
+    renderIdeaEmpty(); ideaLayout(); iScheduleSave(nid, 200);
+    bp.expanded.delete(nid);
+    paintBoxBtn(); renderBoxPanel();
+    if (isPhone()) closeBoxPanel();
+    setTimeout(() => showCopy(ideaEl(nid)), 60);
+    showUndo("Back on the canvas", () => {
+      const cur = ideas.get(nid); if (!cur) return;
+      Object.assign(cur, prev);
+      renderIdea(nid); renderIdeaEmpty(); ideaLayout(); iScheduleSave(nid, 200); paintBoxBtn(); renderBoxPanel();
+    });
+  }
+  function deleteBox(bid) {
+    const at = boxes.findIndex(b => b.id === bid); if (at < 0) return;
+    const box = boxes[at], notes = filedIn(bid);
+    const prevs = notes.map(n => ({ n, box: n.box, filedAt: n.filedAt, x: n.x, y: n.y, m: n.m }));
+    boxes.splice(at, 1); saveBoxes();
+    notes.forEach(n => { unfile(n); iScheduleSave(n.id, 200); });
+    renderIdeaEmpty(); ideaLayout();
+    bp.view = "home"; bp.confirmDel = false; bp.q = "";
+    paintBoxBtn(); renderBoxPanel();
+    showUndo(notes.length ? `Deleted ${box.name}; ${notes.length} note${notes.length > 1 ? "s" : ""} back on the canvas` : `Deleted ${box.name}`, () => {
+      boxes.splice(Math.min(at, boxes.length), 0, box); saveBoxes();
+      prevs.forEach(p => { Object.assign(p.n, { box: p.box, filedAt: p.filedAt, x: p.x, y: p.y, m: p.m }); renderIdea(p.n.id); iScheduleSave(p.n.id, 200); });
+      renderIdeaEmpty(); ideaLayout(); paintBoxBtn(); renderBoxPanel();
+    });
+  }
+
+  // read-only view of a filed note
+  function noteReadHtml(n) {
+    const parts = (n.blocks || []).map(b => {
+      if (b.type === "text") { const h = b.html ? cleanRich(b.html) : escapeHtml(b.text || ""); return h.trim() ? `<div class="rd-text">${h}</div>` : ""; }
+      if (b.type === "bullets") return `<ul class="rd-list">${(b.items || []).map(i => `<li>${i.html ? cleanRich(i.html) : escapeHtml(i.text || "")}</li>`).join("")}</ul>`;
+      if (b.type === "table") return `<div class="rd-table">${(b.rows || []).map((r, ri) => `<div class="${ri ? "" : "rd-head"}">${escapeHtml(r.a || "")}</div><div class="${ri ? "" : "rd-head"}">${escapeHtml(r.b || "")}</div>`).join("")}</div>`;
+      if (b.type === "link" && b.url) return `<a class="rd-link" href="${escapeAttr(safeHref(b.url))}" target="_blank" rel="noopener noreferrer">${icon.link}<span>${escapeHtml(b.label || b.url.replace(/^https?:\/\//i, ""))}</span></a>`;
+      return "";
+    }).filter(Boolean);
+    const acts = n.actions ? n.actions.items.filter(a => (a.text || "").trim()) : [];
+    if (acts.length) parts.push(`<div class="rd-actions"><div class="rd-act-title">${escapeHtml(n.actions.title || "ACTION ITEMS")}</div>${acts.map(a => `<div class="rd-act${a.done ? " done" : ""}"><span class="rd-box">${a.done ? icon.check : ""}</span><span class="rd-act-t">${escapeHtml(a.text)}</span><span class="rd-who">${escapeHtml(a.who || "")}</span></div>`).join("")}</div>`);
+    return parts.join("") || `<div class="rd-empty">This note is empty.</div>`;
+  }
+
+  /* ----- the Boxes panel ----- */
+  const bp = { view: "home", box: null, q: "", expanded: new Set(), creating: false, renaming: false, confirmDel: false };
+  let panel = null, bpSearchT;
+  function ensurePanel() {
+    if (panel) return panel;
+    panel = document.createElement("aside");
+    panel.className = "box-panel"; panel.hidden = true; panel.setAttribute("aria-label", "Boxes");
+    panel.innerHTML = `
+      <div class="bp-head">
+        <button class="bp-back" aria-label="All boxes" title="All boxes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <div class="bp-title"></div>
+        <button class="bp-x" aria-label="Close boxes" title="Close">×</button>
+      </div>
+      <div class="bp-tools" hidden></div>
+      <label class="bp-searchrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg><input class="bp-search" type="search" autocomplete="off" aria-label="Search filed notes"></label>
+      <div class="bp-body"></div>`;
+    document.body.appendChild(panel);
+    wirePanel();
+    return panel;
+  }
+  function openBoxPanel(opts = {}) {
+    ensurePanel();
+    if (opts.q != null) { bp.view = "home"; bp.q = opts.q; }
+    panel.hidden = false;
+    // on a computer the panel sits under the header so search and the Boxes button stay in reach
+    panel.style.top = isPhone() ? "" : Math.max(0, Math.round(document.querySelector(".topbar").getBoundingClientRect().bottom)) + "px";
+    document.body.classList.add("boxes-open");
+    document.getElementById("boxesBtn").setAttribute("aria-expanded", "true");
+    renderBoxPanel();
+    if (!isPhone() || opts.q) setTimeout(() => panel.querySelector(".bp-search").focus(), 30);
+  }
+  function closeBoxPanel() {
+    if (!panel) return;
+    panel.hidden = true;
+    document.body.classList.remove("boxes-open");
+    document.getElementById("boxesBtn").setAttribute("aria-expanded", "false");
+    bp.creating = bp.renaming = bp.confirmDel = false;
+  }
+  function noteRowHtml(n, showBox) {
+    const b = boxOf(n), open = bp.expanded.has(n.id);
+    const snip = escapeHtml(blocksText(normNote(n)).replace(/\s+/g, " ").slice(0, 200));
+    const tags = (n.tags || []).map(t => `<span class="bp-tag" style="--chip:${safeColor(tagColor(t))}"><span class="chip-dot"></span>${escapeHtml(t)}</span>`).join("");
+    const acts = n.actions ? n.actions.items.filter(a => (a.text || "").trim()) : [];
+    const open_ = acts.filter(a => !a.done).length;
+    return `<article class="bp-note${open ? " open" : ""}" data-nid="${escapeAttr(n.id)}" style="--c:${safeColor(n.color)}">
+      <button class="bp-note-main" aria-expanded="${open}">
+        <span class="bp-note-title">${escapeHtml(n.title || "NOTE")}</span>
+        <span class="bp-note-date">${shortWhen(n.filedAt || n.updated || n.created)}</span>
+        ${showBox && b ? `<span class="bp-note-box" style="--bc:${safeColor(b.color)}">${ICON_BOX}${escapeHtml(b.name)}</span>` : ""}
+        ${open ? "" : `<span class="bp-note-snip">${snip || "<em>No text</em>"}</span>`}
+      </button>
+      ${open ? `<div class="bp-preview">${noteReadHtml(n)}</div>` : ""}
+      <div class="bp-note-foot">${tags}${acts.length ? `<span class="bp-acts">${open_ ? open_ + " open action" + (open_ > 1 ? "s" : "") : "Actions done"}</span>` : ""}<button class="bp-restore" title="Put this note back on the canvas">${ICON_OUT}Back to canvas</button></div>
+    </article>`;
+  }
+  function renderBoxPanel() {
+    paintBoxBtn();
+    if (!panel || panel.hidden) return;
+    const head = panel.querySelector(".bp-title"), back = panel.querySelector(".bp-back"), tools = panel.querySelector(".bp-tools"), body = panel.querySelector(".bp-body"), input = panel.querySelector(".bp-search");
+    const terms = bp.q.toLowerCase().split(/\s+/).filter(Boolean);
+    const match = n => !terms.length || hasAll(noteSearchText(n), terms);
+    let box = bp.view === "box" ? (bp.box === ORPHAN ? (allFiled().some(isOrphan) ? orphanBox() : null) : boxById(bp.box)) : null;
+    if (!box) bp.view = "home";
+    back.hidden = !box;
+    if (input.value !== bp.q) input.value = bp.q;
+    input.placeholder = box ? `Search ${box.name}…` : "Search all boxes…";
+    const keepScroll = body.scrollTop;
+    if (!box) {
+      head.innerHTML = `<span class="bp-h-icon">${ICON_BOX}</span><span>Boxes</span>`; head.style.color = "";
+      tools.hidden = true; tools.innerHTML = "";
+      if (terms.length) {
+        const res = allFiled().filter(match);
+        body.innerHTML = `<div class="bp-count">${res.length ? res.length + " filed note" + (res.length > 1 ? "s" : "") + " match" + (res.length > 1 ? "" : "es") : "No filed notes match."}</div>` + res.map(n => noteRowHtml(n, true)).join("");
+      } else {
+        const rows = boxes.map(b => `<button class="bp-boxrow" data-bid="${escapeAttr(b.id)}" style="--bc:${safeColor(b.color)}"><span class="bp-boxicon">${ICON_BOX}</span><span class="bp-boxname">${escapeHtml(b.name)}</span><span class="bp-boxcount">${filedIn(b.id).length}</span>${ICON_CHEV_R}</button>`);
+        const orph = filedIn(ORPHAN).length;
+        if (orph) rows.push(`<button class="bp-boxrow" data-bid="${ORPHAN}" style="--bc:#8e8e93"><span class="bp-boxicon">${ICON_BOX}</span><span class="bp-boxname">Unsorted</span><span class="bp-boxcount">${orph}</span>${ICON_CHEV_R}</button>`);
+        const add = bp.creating
+          ? `<form class="bp-newform"><input class="bp-newname" placeholder="Box name, like Meetings" maxlength="40" autocomplete="off"><button type="submit">Add</button><button type="button" class="bp-cancel" aria-label="Cancel">×</button></form>`
+          : `<button class="bp-new">${icon.plus}New box</button>`;
+        const hint = !boxes.length
+          ? `<p class="bp-hint">Make a box for each kind of note, like <b>Meetings</b>, <b>Site Walks</b> or <b>Ideas</b>. Then tap the color dot on any note and choose <b>Move to box</b>.</p>`
+          : (!allFiled().length ? `<p class="bp-hint">To file a note, tap the color dot on the note and choose <b>Move to box</b>. It leaves the canvas and waits here.</p>` : "");
+        body.innerHTML = rows.join("") + add + hint;
+      }
+    } else {
+      head.innerHTML = bp.renaming
+        ? `<form class="bp-renameform"><input class="bp-rename-in" maxlength="40" autocomplete="off" value="${escapeAttr(box.name)}"></form>`
+        : `<span class="bp-h-icon">${ICON_BOX}</span><span>${escapeHtml(box.name)}</span>`;
+      head.style.color = safeColor(box.color);
+      tools.hidden = box.id === ORPHAN;
+      tools.innerHTML = box.id === ORPHAN ? "" : (bp.confirmDel
+        ? `<div class="bp-confirm">Delete this box? ${filedIn(box.id).length ? "Its notes go back on the canvas." : ""}<button class="bp-del-yes">Delete</button><button class="bp-del-no">Keep</button></div>`
+        : `<button class="bp-tool bp-rename">Rename</button><button class="bp-tool bp-del">Delete box</button><span class="bp-colors">${NEW_CARD_COLORS.map(c => `<button class="bp-color" data-c="${c}" style="background:${c}" aria-label="Box color ${c}" aria-pressed="${c.toLowerCase() === (box.color || "").toLowerCase()}"></button>`).join("")}</span>`);
+      const notes = filedIn(box.id), res = notes.filter(match);
+      body.innerHTML = !notes.length
+        ? `<p class="bp-hint">This box is empty. Tap the color dot on any note and choose <b>Move to box</b>, then <b>${escapeHtml(box.name)}</b>.</p>`
+        : (terms.length ? `<div class="bp-count">${res.length} of ${notes.length} notes</div>` : `<div class="bp-count">${notes.length} note${notes.length > 1 ? "s" : ""} · newest first</div>`) + res.map(n => noteRowHtml(n, false)).join("");
+    }
+    body.scrollTop = keepScroll;
+    if (bp.creating) { const i = body.querySelector(".bp-newname"); if (i && document.activeElement !== i) i.focus(); }
+    if (bp.renaming) { const i = head.querySelector(".bp-rename-in"); if (i && document.activeElement !== i) { i.focus(); i.select(); } }
+  }
+  function wirePanel() {
+    const input = panel.querySelector(".bp-search");
+    input.addEventListener("input", () => { bp.q = input.value; clearTimeout(bpSearchT); bpSearchT = setTimeout(renderBoxPanel, 120); });
+    panel.addEventListener("keydown", e => {
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      if (bp.creating || bp.renaming || bp.confirmDel) { bp.creating = bp.renaming = bp.confirmDel = false; renderBoxPanel(); return; }
+      if (bp.q) { bp.q = ""; renderBoxPanel(); return; }
+      closeBoxPanel(); document.getElementById("boxesBtn").focus();
+    });
+    panel.addEventListener("submit", e => {
+      e.preventDefault();
+      if (e.target.closest(".bp-newform")) { const v = e.target.querySelector("input").value.trim(); if (v) createBox(v); bp.creating = false; renderBoxPanel(); return; }
+      if (e.target.closest(".bp-renameform")) { const b = boxById(bp.box), v = e.target.querySelector("input").value.trim(); if (b && v) { b.name = v.slice(0, 40); saveBoxes(); } bp.renaming = false; renderBoxPanel(); }
+    });
+    panel.addEventListener("focusout", e => {
+      if (e.target.classList.contains("bp-rename-in") && bp.renaming) setTimeout(() => { if (!bp.renaming) return; const b = boxById(bp.box), v = e.target.value.trim(); if (b && v) { b.name = v.slice(0, 40); saveBoxes(); } bp.renaming = false; renderBoxPanel(); }, 0);
+    });
+    panel.addEventListener("click", e => {
+      const t = e.target;
+      if (t.closest(".bp-x")) { closeBoxPanel(); return; }
+      if (t.closest(".bp-back")) { bp.view = "home"; bp.q = ""; bp.confirmDel = bp.renaming = false; renderBoxPanel(); return; }
+      const row = t.closest(".bp-boxrow");
+      if (row) { bp.view = "box"; bp.box = row.dataset.bid; bp.q = ""; bp.expanded.clear(); renderBoxPanel(); panel.querySelector(".bp-body").scrollTop = 0; return; }
+      if (t.closest(".bp-new")) { bp.creating = true; renderBoxPanel(); return; }
+      if (t.closest(".bp-cancel")) { bp.creating = false; renderBoxPanel(); return; }
+      if (t.closest(".bp-restore")) { restoreNote(t.closest(".bp-note").dataset.nid); return; }
+      if (t.closest(".rd-link")) return;
+      const main = t.closest(".bp-note-main");
+      if (main) { const nid = main.closest(".bp-note").dataset.nid; if (bp.expanded.has(nid)) bp.expanded.delete(nid); else bp.expanded.add(nid); renderBoxPanel(); return; }
+      if (t.closest(".bp-rename")) { bp.renaming = true; renderBoxPanel(); return; }
+      const col = t.closest(".bp-color");
+      if (col) { const b = boxById(bp.box); if (b) { b.color = col.dataset.c; saveBoxes(); renderBoxPanel(); } return; }
+      if (t.closest(".bp-del")) { bp.confirmDel = true; renderBoxPanel(); return; }
+      if (t.closest(".bp-del-no")) { bp.confirmDel = false; renderBoxPanel(); return; }
+      if (t.closest(".bp-del-yes")) { deleteBox(bp.box); return; }
+    });
+  }
+  // the "Move to box" list inside a note's color menu
+  function showBoxChooser(pop, id) {
+    const n = ideas.get(id);
+    pop.classList.add("box-pop");
+    pop.innerHTML = `<div class="pop-label">Move to box</div>
+      <div class="bx-list">${boxes.map(b => `<button class="bx-pick" data-bid="${escapeAttr(b.id)}" style="--bc:${safeColor(b.color)}">${ICON_BOX}<span>${escapeHtml(b.name)}</span><span class="bx-k">${filedIn(b.id).length}</span></button>`).join("")}</div>
+      <form class="bx-new"><input placeholder="${boxes.length ? "New box name" : "First box name"}" maxlength="40" autocomplete="off" aria-label="New box name"><button type="submit">${boxes.length ? "Add" : "Create"}</button></form>
+      <p class="bx-note">The note leaves the canvas. Find it any time with the Boxes button at the top.</p>`;
+    if (!boxes.length) setTimeout(() => { const i = pop.querySelector(".bx-new input"); if (i) i.focus(); }, 30);
+    pop.addEventListener("submit", e => {
+      e.preventDefault();
+      const v = pop.querySelector(".bx-new input").value.trim(); if (!v) return;
+      const b = createBox(v); fileNote(id, b.id);
+    });
+  }
+
+  document.getElementById("boxesBtn").addEventListener("click", () => { if (panel && !panel.hidden) closeBoxPanel(); else openBoxPanel(); });
 
   function startIdeaSync() {
     let first = true;
@@ -2469,7 +3305,12 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
         ideas.set(id, incoming);
         renderIdea(id);
       });
-      renderIdeaEmpty(); ideaLayout(); iSaveLocal();
+      renderIdeaEmpty(); ideaLayout(); iSaveLocal(); renderBoxPanel();
+    }, () => {});
+    db.doc("settings/boxes").onSnapshot(s => {
+      if (!s.exists) { if (boxes.length) saveBoxes(); return; }
+      const d = s.data();
+      if (d && Array.isArray(d.boxes)) { boxes = d.boxes.filter(b => b && b.id).map(b => ({ ...b })); boxesSaveLocal(); renderBoxPanel(); }
     }, () => {});
     db.doc("settings/tags").onSnapshot(s => {
       if (!s.exists) { if (customTags.length) saveTags(); return; }
@@ -2708,10 +3549,14 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       <div class="swatches">${COLORS.map(c => `<button class="sw" style="background:${c}" data-c="${c}" aria-label="Color ${c}" aria-pressed="${c.toLowerCase() === (s.color || "").toLowerCase()}"></button>`).join("")}</div>
       <label class="custom"><input type="color" id="scolor-${id}" value="${/^#[0-9a-f]{6}$/i.test(s.color) ? s.color : "#ffffff"}">Custom color</label>
       <hr>
-      <button class="pop-action sort-date">Sort milestones by date</button>
+      <div class="pop-menu">
+        <button class="pop-action sort-date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M3.5 16.5L7 20l3.5-3.5M13 6h8M13 11h6M13 16h4"/></svg>Sort by date</button>
+      </div>
       <hr>
-      <button class="pop-action dup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6A2.5 2.5 0 0 0 13 3.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg>Duplicate card</button>
-      <div class="del-row"><button class="del">Delete schedule</button></div>`;
+      <div class="pop-menu">
+        <button class="pop-action dup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6A2.5 2.5 0 0 0 13 3.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg>Duplicate card</button>
+        <div class="del-row"><button class="pop-action danger del">${icon.trash}Delete schedule</button></div>
+      </div>`;
     card.appendChild(pop);
     const apply = c => {
       s.color = c;
@@ -3004,7 +3849,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     });
     ideas.forEach(n => {
       const el = ideaEl(n.id); if (!el) return;
-      out.push({ el, title: (n.title || "") + " " + (n.tags || []).join(" "), rows: [{ text: noteText(normNote(n)), el: el.querySelector(".note-blocks") }] });
+      out.push({ el, title: (n.title || "") + " " + (n.tags || []).join(" "), rows: [{ text: blocksText(normNote(n)), el: el.querySelector(".note-blocks") }, { text: actionsText(n), el: el.querySelector(".note-actions") }] });
     });
     scheds.forEach(s => {
       const el = schedEl(s.id); if (!el) return;
@@ -3033,6 +3878,9 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
       if (hit) hits++;
     });
     searchCount.textContent = on ? (hits === 1 ? "1 card" : hits + " cards") : "";
+    const boxed = on ? allFiled().filter(n => hasAll(noteSearchText(n), terms)).length : 0;
+    const sb = document.getElementById("searchBoxed");
+    sb.hidden = !boxed; sb.textContent = `+ ${boxed} in boxes`;
     if (!on) restorePositions();
     arrange();
   }
@@ -3076,6 +3924,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
     applySearch();
   }
   searchBtn.addEventListener("click", () => (search.open ? closeSearch() : openSearch()));
+  document.getElementById("searchBoxed").addEventListener("click", () => openBoxPanel({ q: search.q }));
   document.getElementById("searchClose").addEventListener("click", closeSearch);
   let searchT;
   searchInput.addEventListener("input", () => { search.q = searchInput.value; clearTimeout(searchT); searchT = setTimeout(applySearch, 120); });
@@ -3122,7 +3971,7 @@ body.item-drag, body.item-drag * { cursor: grabbing !important; user-select: non
   loadLocal();
   if (!lists.has(PRI_ID)) lists.set(PRI_ID, { id: PRI_ID, title: "PRIORITIES", color: PRI_COLOR, x: 0, y: 0, z: 1, collapsed: false, created: Date.now(), items: [] });
   renderAll();
-  iLoadLocal();
+  iLoadLocal(); boxesLoadLocal(); paintBoxBtn();
   renderAllIdeas();
   sLoadLocal();
   renderAllScheds();
